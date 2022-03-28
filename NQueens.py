@@ -1,0 +1,259 @@
+import sys
+import heapq
+import copy
+
+# read in the arguments
+algorithm = sys.argv[1]
+# algorithm = "FOR"
+numQueens = sys.argv[2]
+numQueens = int(numQueens)
+# numQueens = 4
+outputFileName = sys.argv[3]
+
+# globals
+# for debugging
+debug = 0
+# to determine propagation algorithm
+globalAgorithm = algorithm
+# for printing
+globalBacktracks = 0
+globalSolutions = 0
+globalSolutionStrings = []
+# for determining conflicts
+globalNumQueens = numQueens
+
+
+# taken from stack overflow, used to create a matrix instead of numpy
+def createSquareMatrix(count, initialize):
+    matrix = []
+    for i in range(count):
+        # create a list for each row
+        rowList = []
+        for j in range(count):
+            # append the initialization value for each column
+            rowList.append(initialize)
+        matrix.append(rowList)
+    return matrix
+
+
+# modified from createMatrix
+def createDomains(queenCount):
+    domains = []
+    for i in range(queenCount):
+        colDomain = set()
+        for j in range(queenCount):
+            colDomain.add(j)
+        domains.append(colDomain)
+    return domains
+
+
+def noEmptyDomains(domains):
+    global debug
+    for domain in domains:
+        # if domain is empty
+        if domain == set():
+            return False
+    return True
+
+
+def determineAssignment(domains):
+    # make a priority queue of domains(their index into the list) sorted by how many values are remaining
+    remainingValues = []
+    for index, domain in enumerate(domains):
+        heapq.heappush(remainingValues, (len(domain), index))
+    # get the domain with the MRV
+    chosenQueen = heapq.heappop(remainingValues)
+    # check if the first column is tied for MRV (because we have been instructed to prioritize it)
+    # it might actually be the MRV (in which case this redundancy causes no harm)
+    lenFirst = len(domains[0])
+    if lenFirst == chosenQueen[0]:
+        chosenQueen = (lenFirst, 0)
+    # return the index of the domain (the queen's column = queen) and the row to assign for that queen
+    # this removes the assigned row from that queen's domain
+    # return queen, row
+    queen = chosenQueen[1]
+    return queen, domains[queen].pop()
+
+
+def areDiagonal(queen, otherQueen, row, otherRow):
+    if row == -1 or otherRow == -1:
+        return False
+    dx = abs(queen - otherQueen)
+    dy = abs(row - otherRow)
+    if dx == dy:
+        return True
+    return False
+
+
+def isConflicting(queenLocationsCopy):
+    global globalNumQueens
+
+    currentAssignments = []
+    for queen in range(globalNumQueens):
+        # about to check if/where each queen has been assigned
+        # for starters, -1 means they haven't been assigned
+        currentAssignments.append(-1)
+
+    # after this loop, currentAssignments will have the row to which each queen has been assigned (or -1 if not assigned)
+    # note that "queen" is a column index
+    for queen, assignment in enumerate(queenLocationsCopy):
+        for row in range(len(assignment)):
+            if assignment[row]:
+                currentAssignments[queen] = row
+
+    for queen, row in enumerate(currentAssignments):
+        for otherQueen, otherRow in enumerate(currentAssignments):
+            if (not queen == otherQueen):
+                # we are comparing the assignments of two different queens
+                if (not row == -1) and row == otherRow:
+                    # two queens have been assigned to the same row
+                    return True
+                if areDiagonal(queen, otherQueen, row, otherRow):
+                    # two queens have diagonally conflicting assignments
+                    return True
+
+    return False
+
+
+def makeSolutionString(queensAssignedCopy):
+    solutionString = ""
+    for queen in queensAssignedCopy:
+        for isAssignedToRow in queen:
+            if isAssignedToRow:
+                solutionString += "1 "
+            else:
+                solutionString += "0 "
+        solutionString += "\n"
+    return solutionString
+
+
+# FOR propagation
+def forPropagate(domainsCopy, assignedQueen, assignedRow):
+    domainsCopyCopy = copy.deepcopy(domainsCopy)
+    for queen, domain in enumerate(domainsCopyCopy):
+        # remove the assigned row from the remaining domains
+        domainsCopy[queen].discard(assignedRow)
+
+        # remove diagonal conflicts from remaining domains
+        for row in domain:
+            dx = abs(queen - assignedQueen)
+            dy = abs(row - assignedRow)
+            if dx == dy:
+                domainsCopy[queen].discard(row)
+
+
+# MAC propagation
+def macPropagate(domainsCopy, assignedQueen, assignedRow):
+    return domainsCopy
+
+
+# backtrackSearch
+def backtrackSearch(domains, queensAssigned, queenLocations):
+    global globalAgorithm
+    global globalBacktracks
+    global globalSolutions
+    global globalSolutionStrings
+    
+    global debug
+    debug += 1
+
+    parentDebug = 0
+    print("parent:", domains)
+    print(debug)
+
+    # while there are no empty domains
+    while noEmptyDomains(domains):
+        # parentDebug += 1
+        # print(parentDebug)
+        
+        # determine which queen to assign (and where) within domains (MRV, (maybe DH, LCV, tiebreaker))
+        # this removes that row for the chosen queen's domain (because it is the assignment we are currently trying)
+        assignedQueen, assignedRow = determineAssignment(domains)
+        if assignedQueen == 1 and assignedRow == 3:
+            print("bingo", domains)
+            print("bingo", debug)
+        
+        # (assign the queen)
+        queensAssignedCopy = copy.deepcopy(queensAssigned)
+        queenLocationsCopy = copy.deepcopy(queenLocations)
+        # set col in copy of queensAssigned to True
+        queensAssignedCopy[assignedQueen] = True
+        # set cell in queenLocations to true
+        queenLocationsCopy[assignedQueen][assignedRow] = True
+        
+        # if there is a conflict - use the copy of queenLocations to check if there is a conflict
+        if isConflicting(queenLocationsCopy):
+            # increment number of backtracks
+            globalBacktracks += 1
+            # backtrack by continuing to the next assignment in the current recursive call
+            continue
+
+        # setting isSolution to False if any queens are unassigned
+        isSolution = True
+        for queen in queensAssignedCopy:
+            if not queen:
+                isSolution = False
+
+        # if all queens have been assigned (no conflicting assignments will have reached this point)
+        if isSolution:
+            # save the solution string for printing
+            solutionString = makeSolutionString(queensAssignedCopy)
+            globalSolutionStrings.append(solutionString)
+            # increment number of solutions
+            globalSolutions += 1
+            
+            # if we haven't reached 2*N solutions
+            maxSolutions = 2 * globalNumQueens
+            if not globalSolutions == maxSolutions:
+                # increment number of backtracks
+                globalBacktracks += 1
+                # backtrack by continuing
+                continue
+            else:
+                doPrint()
+                exit()
+
+        # copy domains for propagating constraints
+        domainsCopy = copy.deepcopy(domains)
+        
+        # propagate constraints through the copy of domains (either with FOR or MAC)
+        # this removes possible assignments from the copy of domains
+        if globalAgorithm == "FOR":
+            forPropagate(domainsCopy, assignedQueen, assignedRow)
+        else:
+            macPropagate(domainsCopy, assignedQueen, assignedRow)
+        
+        backtrackSearch(domainsCopy, queensAssignedCopy, queenLocationsCopy)
+
+
+def doPrint():
+    global globalAgorithm
+    global globalBacktracks
+    global globalSolutions
+    global globalSolutionStrings
+    print(globalAgorithm, "\n")
+    print("Solutions:", globalSolutions, "\n")
+    print("Backtracks:", globalBacktracks, "\n")
+    i = 1
+    for solutionString in globalSolutionStrings:
+        print("#", str(i))
+        i += 1
+        print(solutionString)
+
+
+# main
+
+# what are the remaining domains for each queen's assignment?
+domains = createDomains(numQueens)
+
+# has the queen in each column been assigned?
+queensAssigned = []
+for i in range(numQueens):
+    queensAssigned.append(False)
+
+# to which cell has the queen in each column been assigned?
+queenLocations = createSquareMatrix(numQueens, False)
+
+backtrackSearch(domains, queensAssigned, queenLocations)
+
+doPrint()
