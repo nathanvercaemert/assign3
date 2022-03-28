@@ -204,8 +204,8 @@ def backtrackSearch(domains, queensAssigned, queenLocations):
             # if we haven't reached 2*N solutions
             maxSolutions = 2 * globalNumQueens
             if not globalSolutions == maxSolutions:
-                # increment number of backtracks
-                globalBacktracks += 1
+                # don't increment number of backtracks
+                # globalBacktracks += 1
                 # backtrack by continuing
                 continue
             else:
@@ -223,6 +223,7 @@ def backtrackSearch(domains, queensAssigned, queenLocations):
             macPropagate(domainsCopy, assignedQueen, assignedRow)
         
         backtrackSearch(domainsCopy, queensAssignedCopy, queenLocationsCopy)
+    globalBacktracks += 1
 
 
 def doPrint():
@@ -254,5 +255,8 @@ for i in range(numQueens):
 queenLocations = createSquareMatrix(numQueens, False)
 
 backtrackSearch(domains, queensAssigned, queenLocations)
+
+# note that there is an extra backtrack if the algorithm completes
+globalBacktracks -= 1
 
 doPrint()
