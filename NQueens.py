@@ -56,12 +56,14 @@ def noEmptyDomains(domains, queensAssigned):
     return True
 
 
-def determineAssignment(domains):
+def determineAssignment(domains, queensAssigned):
     # make a priority queue of domains(their index into the list) sorted by how many values are remaining
     remainingValues = []
     for index, domain in enumerate(domains):
-        heapq.heappush(remainingValues, (len(domain), index))
-    # get the domain with the MRV
+        if not queensAssigned[index]:
+            heapq.heappush(remainingValues, (len(domain), index))
+
+    # get the domain with the MRV (that isn't empty because it's already been assigned)
     chosenQueen = heapq.heappop(remainingValues)
     # check if the first column is tied for MRV (because we have been instructed to prioritize it)
     # it might actually be the MRV (in which case this redundancy causes no harm)
@@ -115,9 +117,9 @@ def isConflicting(queenLocationsCopy):
     return False
 
 
-def makeSolutionString(queensAssignedCopy):
+def makeSolutionString(queenLocationsCopy):
     solutionString = ""
-    for queen in queensAssignedCopy:
+    for queen in queenLocationsCopy:
         for isAssignedToRow in queen:
             if isAssignedToRow:
                 solutionString += "1 "
@@ -168,7 +170,7 @@ def backtrackSearch(domains, queensAssigned, queenLocations):
         
         # determine which queen to assign (and where) within domains (MRV, (maybe DH, LCV, tiebreaker))
         # this removes that row for the chosen queen's domain (because it is the assignment we are currently trying)
-        assignedQueen, assignedRow = determineAssignment(domains)
+        assignedQueen, assignedRow = determineAssignment(domains, queensAssigned)
         
         # (assign the queen)
         queensAssignedCopy = copy.deepcopy(queensAssigned)
@@ -194,7 +196,7 @@ def backtrackSearch(domains, queensAssigned, queenLocations):
         # if all queens have been assigned (no conflicting assignments will have reached this point)
         if isSolution:
             # save the solution string for printing
-            solutionString = makeSolutionString(queensAssignedCopy)
+            solutionString = makeSolutionString(queenLocationsCopy)
             globalSolutionStrings.append(solutionString)
             # increment number of solutions
             globalSolutions += 1
