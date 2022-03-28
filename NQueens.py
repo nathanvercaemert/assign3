@@ -47,11 +47,11 @@ def createDomains(queenCount):
     return domains
 
 
-def noEmptyDomains(domains):
+def noEmptyDomains(domains, queensAssigned):
     global debug
-    for domain in domains:
+    for queen, domain in enumerate(domains):
         # if domain is empty
-        if domain == set():
+        if domain == set() and (not queensAssigned[queen]):
             return False
     return True
 
@@ -157,21 +157,18 @@ def backtrackSearch(domains, queensAssigned, queenLocations):
     global debug
     debug += 1
 
-    parentDebug = 0
-    print("parent:", domains)
-    print(debug)
+    # parentDebug = 0
+    # print("parent:", domains)
+    # print(debug)
 
     # while there are no empty domains
-    while noEmptyDomains(domains):
+    while noEmptyDomains(domains, queensAssigned):
         # parentDebug += 1
         # print(parentDebug)
         
         # determine which queen to assign (and where) within domains (MRV, (maybe DH, LCV, tiebreaker))
         # this removes that row for the chosen queen's domain (because it is the assignment we are currently trying)
         assignedQueen, assignedRow = determineAssignment(domains)
-        if assignedQueen == 1 and assignedRow == 3:
-            print("bingo", domains)
-            print("bingo", debug)
         
         # (assign the queen)
         queensAssignedCopy = copy.deepcopy(queensAssigned)
