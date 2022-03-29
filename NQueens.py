@@ -57,7 +57,7 @@ def noEmptyDomains(domains, queensAssigned):
 
 
 def determineAssignment(domains, queensAssigned):
-    # determine which column to assign
+    # determine which column to assign (the lowest unassigned queen)
     for queenIndex, isAssigned in enumerate(queensAssigned):
         if not isAssigned:
             queen = queenIndex
@@ -76,27 +76,6 @@ def determineAssignment(domains, queensAssigned):
     # return queen, row
     domains[queen].remove(row)
     return queen, row
-
-
-# def determineAssignment(domains, queensAssigned):
-#     # make a priority queue of domains(their index into the list) sorted by how many values are remaining
-#     remainingValues = []
-#     for index, domain in enumerate(domains):
-#         if not queensAssigned[index]:
-#             heapq.heappush(remainingValues, (len(domain), index))
-
-#     # get the domain with the MRV (that isn't empty because it's already been assigned)
-#     chosenQueen = heapq.heappop(remainingValues)
-#     # check if the first column is tied for MRV (because we have been instructed to prioritize it)
-#     # it might actually be the MRV (in which case this redundancy causes no harm)
-#     lenFirst = len(domains[0])
-#     if lenFirst == chosenQueen[0]:
-#         chosenQueen = (lenFirst, 0)
-#     # return the index of the domain (the queen's column = queen) and the row to assign for that queen
-#     # this removes the assigned row from that queen's domain
-#     # return queen, row
-#     queen = chosenQueen[1]
-#     return queen, domains[queen].pop()
 
 
 def areDiagonal(queen, otherQueen, row, otherRow):
