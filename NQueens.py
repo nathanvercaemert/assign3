@@ -57,24 +57,46 @@ def noEmptyDomains(domains, queensAssigned):
 
 
 def determineAssignment(domains, queensAssigned):
-    # make a priority queue of domains(their index into the list) sorted by how many values are remaining
-    remainingValues = []
-    for index, domain in enumerate(domains):
-        if not queensAssigned[index]:
-            heapq.heappush(remainingValues, (len(domain), index))
+    # determine which column to assign
+    for queenIndex, isAssigned in enumerate(queensAssigned):
+        if not isAssigned:
+            queen = queenIndex
 
-    # get the domain with the MRV (that isn't empty because it's already been assigned)
-    chosenQueen = heapq.heappop(remainingValues)
-    # check if the first column is tied for MRV (because we have been instructed to prioritize it)
-    # it might actually be the MRV (in which case this redundancy causes no harm)
-    lenFirst = len(domains[0])
-    if lenFirst == chosenQueen[0]:
-        chosenQueen = (lenFirst, 0)
+    # get the lowest unassigned row for the queen
+    row = -1
+    for possibleRow in domains[queen]:
+        if row == -1:
+            row = possibleRow
+        else:
+            if possibleRow < row:
+                row = possibleRow
+    
     # return the index of the domain (the queen's column = queen) and the row to assign for that queen
     # this removes the assigned row from that queen's domain
     # return queen, row
-    queen = chosenQueen[1]
-    return queen, domains[queen].pop()
+    domains[queen].remove(row)
+    return queen, row
+
+
+# def determineAssignment(domains, queensAssigned):
+#     # make a priority queue of domains(their index into the list) sorted by how many values are remaining
+#     remainingValues = []
+#     for index, domain in enumerate(domains):
+#         if not queensAssigned[index]:
+#             heapq.heappush(remainingValues, (len(domain), index))
+
+#     # get the domain with the MRV (that isn't empty because it's already been assigned)
+#     chosenQueen = heapq.heappop(remainingValues)
+#     # check if the first column is tied for MRV (because we have been instructed to prioritize it)
+#     # it might actually be the MRV (in which case this redundancy causes no harm)
+#     lenFirst = len(domains[0])
+#     if lenFirst == chosenQueen[0]:
+#         chosenQueen = (lenFirst, 0)
+#     # return the index of the domain (the queen's column = queen) and the row to assign for that queen
+#     # this removes the assigned row from that queen's domain
+#     # return queen, row
+#     queen = chosenQueen[1]
+#     return queen, domains[queen].pop()
 
 
 def areDiagonal(queen, otherQueen, row, otherRow):
@@ -159,16 +181,11 @@ def backtrackSearch(domains, queensAssigned, queenLocations):
     global debug
     debug += 1
 
-    # parentDebug = 0
-    # print("parent:", domains)
-    # print(debug)
-
+    # print(domains)
     # while there are no empty domains
     while noEmptyDomains(domains, queensAssigned):
-        # parentDebug += 1
-        # print(parentDebug)
         
-        # determine which queen to assign (and where) within domains (MRV, (maybe DH, LCV, tiebreaker))
+        # determine which queen to assign (and where) within domains
         # this removes that row for the chosen queen's domain (because it is the assignment we are currently trying)
         assignedQueen, assignedRow = determineAssignment(domains, queensAssigned)
         
@@ -182,10 +199,9 @@ def backtrackSearch(domains, queensAssigned, queenLocations):
         
         # if there is a conflict - use the copy of queenLocations to check if there is a conflict
         if isConflicting(queenLocationsCopy):
-            # increment number of backtracks
-            globalBacktracks += 1
             # backtrack by continuing to the next assignment in the current recursive call
             continue
+            
 
         # setting isSolution to False if any queens are unassigned
         isSolution = True
@@ -195,6 +211,8 @@ def backtrackSearch(domains, queensAssigned, queenLocations):
 
         # if all queens have been assigned (no conflicting assignments will have reached this point)
         if isSolution:
+            # it was a valid assignment so increment backtracks
+            globalBacktracks += 1
             # save the solution string for printing
             solutionString = makeSolutionString(queenLocationsCopy)
             globalSolutionStrings.append(solutionString)
@@ -204,8 +222,6 @@ def backtrackSearch(domains, queensAssigned, queenLocations):
             # if we haven't reached 2*N solutions
             maxSolutions = 2 * globalNumQueens
             if not globalSolutions == maxSolutions:
-                # don't increment number of backtracks
-                # globalBacktracks += 1
                 # backtrack by continuing
                 continue
             else:
@@ -219,11 +235,13 @@ def backtrackSearch(domains, queensAssigned, queenLocations):
         # this removes possible assignments from the copy of domains
         if globalAgorithm == "FOR":
             forPropagate(domainsCopy, assignedQueen, assignedRow)
+            if noEmptyDomains(domainsCopy, queensAssignedCopy):
+                # it was a valid assignment so increment backtracks
+                globalBacktracks += 1
         else:
             macPropagate(domainsCopy, assignedQueen, assignedRow)
         
         backtrackSearch(domainsCopy, queensAssignedCopy, queenLocationsCopy)
-    globalBacktracks += 1
 
 
 def doPrint():
@@ -255,8 +273,5 @@ for i in range(numQueens):
 queenLocations = createSquareMatrix(numQueens, False)
 
 backtrackSearch(domains, queensAssigned, queenLocations)
-
-# note that there is an extra backtrack if the algorithm completes
-globalBacktracks -= 1
 
 doPrint()
