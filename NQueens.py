@@ -1,6 +1,7 @@
 import sys
 import heapq
 import copy
+from collections import deque
 
 # read in the arguments
 algorithm = sys.argv[1]
@@ -61,6 +62,7 @@ def determineAssignment(domains, queensAssigned):
     for queenIndex, isAssigned in enumerate(queensAssigned):
         if not isAssigned:
             queen = queenIndex
+            break
 
     # get the lowest unassigned row for the queen
     row = -1
@@ -146,8 +148,63 @@ def forPropagate(domainsCopy, assignedQueen, assignedRow):
 
 
 # MAC propagation
-def macPropagate(domainsCopy, assignedQueen, assignedRow):
-    return domainsCopy
+def macPropagate(domainsCopy, assignedQueen, assignedRow, queensAssignedCopy):
+    # the MAC queue for propagation
+    arcQueue = deque()
+    
+    # need to make a copy of the domains so that I can iterate and remove while I'm iterating
+    domainsCopyCopy = copy.deepcopy(domainsCopy)
+
+    # manually do the first arc-consistency checks for the neighbors of the assigned queen (making sure they only include values in their domains that agree with the assigned value for the assigned queen)
+    # only need to check domains for neighbors of the assigned queen for these first iterations of mac
+    # if an unassigned neighbor's domain is altered, add it to the queue for checking in the below while loop
+    # this first loop is basically AC-3 with xi and xj reversed
+    for queen, domain in enumerate(domainsCopyCopy):
+        if not queensAssignedCopy[queen]:
+            for row in domain:
+                dx = abs(queen - assignedQueen)
+                dy = abs(row - assignedRow)
+                # remove rows that equal the assigned row
+                # remove rows that are diagonally conflicting with assigned row
+                if row == assignedRow or dx == dy:
+                    domainsCopy[queen].remove(row)
+                    # because the variables domain was changed, add the arcs from its neighbors to the queue
+                    for neighbor, isAssigned in enumerate(queensAssignedCopy):
+                        if (not isAssigned) and (not neighbor == queen):
+                            arcQueue.append((neighbor, queen))
+
+    # arcQueue is tuples of (neighbor, queen whose domain has been changed)
+    while arcQueue:
+        # if assignedQueen == 0 and assignedRow == 1:
+        #     print(arcQueue)
+        arc = arcQueue.popleft()
+        neighbor = arc[0]
+        alteredQueen = arc[1]
+        neighborDomain = domainsCopy[neighbor]
+        alteredQueenDomain = domainsCopy[alteredQueen]
+        
+        # make a copy of the neighbor domain so that we can both iterate and remove as we iterate
+        neighborDomainIterationCopy = copy.deepcopy(neighborDomain)
+        
+        for neighborRow in neighborDomainIterationCopy:
+            # if assignedQueen == 0 and assignedRow == 1:
+            #     print("alteredQueen:", alteredQueen)
+            #     print("neighbor:", neighbor)
+            #     print(domainsCopy)
+            #     print(alteredQueenRow)
+            alteredQueenDomainHasSatisfyingValue = False
+            for alteredQueenRow in alteredQueenDomain:
+                dx = abs(alteredQueen - neighbor)
+                dy = abs(alteredQueenRow - neighborRow)
+                if (not dx == dy) and (not alteredQueenRow == neighborRow):
+                    # if assignedQueen == 0 and assignedRow == 1:
+                    #     print('sat')
+                    alteredQueenDomainHasSatisfyingValue = True
+            if not alteredQueenDomainHasSatisfyingValue:
+                neighborDomain.remove(neighborRow)
+                for neighborNeighbor, isAssigned in enumerate(queensAssignedCopy):
+                    if (not isAssigned) and (not neighborNeighbor == neighbor):
+                        arcQueue.append((neighborNeighbor, neighbor))
 
 
 # backtrackSearch
@@ -163,11 +220,10 @@ def backtrackSearch(domains, queensAssigned, queenLocations):
     # print(domains)
     # while there are no empty domains
     while noEmptyDomains(domains, queensAssigned):
-        
         # determine which queen to assign (and where) within domains
         # this removes that row for the chosen queen's domain (because it is the assignment we are currently trying)
         assignedQueen, assignedRow = determineAssignment(domains, queensAssigned)
-        
+
         # (assign the queen)
         queensAssignedCopy = copy.deepcopy(queensAssigned)
         queenLocationsCopy = copy.deepcopy(queenLocations)
@@ -214,11 +270,11 @@ def backtrackSearch(domains, queensAssigned, queenLocations):
         # this removes possible assignments from the copy of domains
         if globalAgorithm == "FOR":
             forPropagate(domainsCopy, assignedQueen, assignedRow)
-            if noEmptyDomains(domainsCopy, queensAssignedCopy):
-                # it was a valid assignment so increment backtracks
-                globalBacktracks += 1
         else:
-            macPropagate(domainsCopy, assignedQueen, assignedRow)
+            macPropagate(domainsCopy, assignedQueen, assignedRow, queensAssignedCopy)
+        if noEmptyDomains(domainsCopy, queensAssignedCopy):
+            # it was a valid assignment so increment backtracks
+            globalBacktracks += 1
         
         backtrackSearch(domainsCopy, queensAssignedCopy, queenLocationsCopy)
 
