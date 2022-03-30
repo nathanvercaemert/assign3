@@ -121,10 +121,15 @@ def isConflicting(queenLocationsCopy):
 
 
 def makeSolutionString(queenLocationsCopy):
+    queenLocationsCopyFlip = createSquareMatrix(numQueens, False)
+    for queen, isAssignedToRow in enumerate(queenLocationsCopy):
+        for row, isAssigned in enumerate(isAssignedToRow):
+            if isAssigned:
+                queenLocationsCopyFlip[row][queen] = True
     solutionString = ""
-    for queen in queenLocationsCopy:
-        for isAssignedToRow in queen:
-            if isAssignedToRow:
+    for queenFlip in queenLocationsCopyFlip:
+        for isAssignedToRowFlip in queenFlip:
+            if isAssignedToRowFlip:
                 solutionString += "1 "
             else:
                 solutionString += "0 "
@@ -245,7 +250,7 @@ def backtrackSearch(domains, queensAssigned, queenLocations):
             globalBacktracks += 1
             # save the solution string for printing
             solutionString = makeSolutionString(queenLocationsCopy)
-            globalSolutionStrings.append(solutionString)
+            globalSolutionStrings.append((queenLocationsCopy, solutionString))
             # increment number of solutions
             globalSolutions += 1
             
@@ -274,6 +279,19 @@ def backtrackSearch(domains, queensAssigned, queenLocations):
         backtrackSearch(domainsCopy, queensAssignedCopy, queenLocationsCopy)
 
 
+# def sortKey(solution):
+#     queenLocations = solution[0]
+#     print(queenLocations)
+#     value = 0
+#     for queen, isAssignedToRow in enumerate(queenLocations):
+#         for row, isAssigned in enumerate(isAssignedToRow):
+#             if isAssigned:
+#                 print(queen)
+#                 print(row)
+#                 value += (10 ** queen) + row
+#     return value
+
+
 def doPrint():
     global globalAgorithm
     global globalBacktracks
@@ -283,10 +301,11 @@ def doPrint():
     print("Solutions:", globalSolutions, "\n")
     print("Backtracks:", globalBacktracks, "\n")
     i = 1
+    # globalSolutionStrings.sort(key=sortKey)
     for solutionString in globalSolutionStrings:
         print("#", str(i))
         i += 1
-        print(solutionString)
+        print(solutionString[1])
 
 
 # main
