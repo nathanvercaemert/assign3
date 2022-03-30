@@ -155,12 +155,12 @@ def macPropagate(domainsCopy, assignedQueen, assignedRow, queensAssignedCopy):
     # need to make a copy of the domains so that I can iterate and remove while I'm iterating
     domainsCopyCopy = copy.deepcopy(domainsCopy)
 
-    # manually do the first arc-consistency checks for the neighbors of the assigned queen (making sure they only include values in their domains that agree with the assigned value for the assigned queen)
-    # only need to check domains for neighbors of the assigned queen for these first iterations of mac
+    # manually do the first arc-consistency checks for the neighbors of the assigned queen (making sure they only leave values in their domains that agree with the assigned value for the assigned queen)
+    # only need to check domains for neighbors of the assigned queen for these first iterations of MAC
     # if an unassigned neighbor's domain is altered, add it to the queue for checking in the below while loop
-    # this first loop is basically AC-3 with xi and xj reversed
+    # this first for loop is basically AC-3 with xi and xj reversed
     for queen, domain in enumerate(domainsCopyCopy):
-        if not queensAssignedCopy[queen]:
+        if (not queensAssignedCopy[queen]) and (not queen == assignedQueen):
             for row in domain:
                 dx = abs(queen - assignedQueen)
                 dy = abs(row - assignedRow)
@@ -168,15 +168,13 @@ def macPropagate(domainsCopy, assignedQueen, assignedRow, queensAssignedCopy):
                 # remove rows that are diagonally conflicting with assigned row
                 if row == assignedRow or dx == dy:
                     domainsCopy[queen].remove(row)
-                    # because the variables domain was changed, add the arcs from its neighbors to the queue
+                    # because the variable's domain was changed, add the arcs from its unassigned neighbors to the queue
                     for neighbor, isAssigned in enumerate(queensAssignedCopy):
                         if (not isAssigned) and (not neighbor == queen):
                             arcQueue.append((neighbor, queen))
 
     # arcQueue is tuples of (neighbor, queen whose domain has been changed)
     while arcQueue:
-        # if assignedQueen == 0 and assignedRow == 1:
-        #     print(arcQueue)
         arc = arcQueue.popleft()
         neighbor = arc[0]
         alteredQueen = arc[1]
@@ -187,22 +185,19 @@ def macPropagate(domainsCopy, assignedQueen, assignedRow, queensAssignedCopy):
         neighborDomainIterationCopy = copy.deepcopy(neighborDomain)
         
         for neighborRow in neighborDomainIterationCopy:
-            # if assignedQueen == 0 and assignedRow == 1:
-            #     print("alteredQueen:", alteredQueen)
-            #     print("neighbor:", neighbor)
-            #     print(domainsCopy)
-            #     print(alteredQueenRow)
             alteredQueenDomainHasSatisfyingValue = False
             for alteredQueenRow in alteredQueenDomain:
                 dx = abs(alteredQueen - neighbor)
                 dy = abs(alteredQueenRow - neighborRow)
                 if (not dx == dy) and (not alteredQueenRow == neighborRow):
-                    # if assignedQueen == 0 and assignedRow == 1:
-                    #     print('sat')
+                    # this condition checks to make sure that the altered queen has a domain value not equal or diagonal to the neighbor's domain value
                     alteredQueenDomainHasSatisfyingValue = True
             if not alteredQueenDomainHasSatisfyingValue:
+                # if there is no satisfying value
+                # remove the unsatisfied row from the neighbor's domain
                 neighborDomain.remove(neighborRow)
                 for neighborNeighbor, isAssigned in enumerate(queensAssignedCopy):
+                    # and add all of the unassigned neighbors (of the now-altered neighbor) to the queue (these are neighborNeighbors)
                     if (not isAssigned) and (not neighborNeighbor == neighbor):
                         arcQueue.append((neighborNeighbor, neighbor))
 
