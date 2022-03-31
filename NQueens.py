@@ -90,36 +90,6 @@ def areDiagonal(queen, otherQueen, row, otherRow):
     return False
 
 
-def isConflicting(queenLocationsCopy):
-    global globalNumQueens
-
-    currentAssignments = []
-    for queen in range(globalNumQueens):
-        # about to check if/where each queen has been assigned
-        # for starters, -1 means they haven't been assigned
-        currentAssignments.append(-1)
-
-    # after this loop, currentAssignments will have the row to which each queen has been assigned (or -1 if not assigned)
-    # note that "queen" is a column index
-    for queen, assignment in enumerate(queenLocationsCopy):
-        for row in range(len(assignment)):
-            if assignment[row]:
-                currentAssignments[queen] = row
-
-    for queen, row in enumerate(currentAssignments):
-        for otherQueen, otherRow in enumerate(currentAssignments):
-            if (not queen == otherQueen):
-                # we are comparing the assignments of two different queens
-                if (not row == -1) and row == otherRow:
-                    # two queens have been assigned to the same row
-                    return True
-                if areDiagonal(queen, otherQueen, row, otherRow):
-                    # two queens have diagonally conflicting assignments
-                    return True
-
-    return False
-
-
 def makeSolutionString(queenLocationsCopy):
     queenLocationsCopyFlip = createSquareMatrix(numQueens, False)
     for queen, isAssignedToRow in enumerate(queenLocationsCopy):
@@ -223,6 +193,7 @@ def backtrackSearch(domains, queensAssigned, queenLocations):
         # determine which queen to assign (and where) within domains
         # this removes that row for the chosen queen's domain (because it is the assignment we are currently trying)
         assignedQueen, assignedRow = determineAssignment(domains, queensAssigned)
+        globalBacktracks += 1
 
         # (assign the queen)
         queensAssignedCopy = copy.deepcopy(queensAssigned)
@@ -231,12 +202,6 @@ def backtrackSearch(domains, queensAssigned, queenLocations):
         queensAssignedCopy[assignedQueen] = True
         # set cell in queenLocations to true
         queenLocationsCopy[assignedQueen][assignedRow] = True
-        
-        # if there is a conflict - use the copy of queenLocations to check if there is a conflict
-        if isConflicting(queenLocationsCopy):
-            # backtrack by continuing to the next assignment in the current recursive call
-            continue
-            
 
         # setting isSolution to False if any queens are unassigned
         isSolution = True
@@ -270,27 +235,13 @@ def backtrackSearch(domains, queensAssigned, queenLocations):
         # this removes possible assignments from the copy of domains
         if globalAgorithm == "FOR":
             forPropagate(domainsCopy, assignedQueen, assignedRow)
+            if noEmptyDomains(domainsCopy, queensAssignedCopy):
+                # it was a valid assignment so increment backtracks
+                globalBacktracks += 1
         else:
             macPropagate(domainsCopy, assignedQueen, assignedRow, queensAssignedCopy)
-        if noEmptyDomains(domainsCopy, queensAssignedCopy):
-            # it was a valid assignment so increment backtracks
-            globalBacktracks += 1
         
         backtrackSearch(domainsCopy, queensAssignedCopy, queenLocationsCopy)
-
-
-# def sortKey(solution):
-#     queenLocations = solution[0]
-#     print(queenLocations)
-#     value = 0
-#     for queen, isAssignedToRow in enumerate(queenLocations):
-#         for row, isAssigned in enumerate(isAssignedToRow):
-#             if isAssigned:
-#                 print(queen)
-#                 print(row)
-#                 value += (10 ** queen) + row
-#     return value
-
 
 def doPrint():
     global globalAgorithm
