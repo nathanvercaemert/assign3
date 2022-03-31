@@ -152,6 +152,72 @@ def forPropagate(domainsCopy, assignedQueen, assignedRow):
                 domainsCopy[queen].discard(row)
 
 
+def forPropagateForMac(domainsCopy, assignedQueen, assignedRow, queensAssignedCopy, wasAltered):
+    domainsCopyCopy = copy.deepcopy(domainsCopy)
+    
+    for queen, domain in enumerate(domainsCopyCopy):
+        altered = False
+        # remove the assigned row from the remaining domains
+        if not queensAssignedCopy[queen]:
+            domainsCopy[queen].discard(assignedRow)
+            altered = True
+
+        # remove diagonal conflicts from remaining domains
+        for row in domain:
+            dx = abs(queen - assignedQueen)
+            dy = abs(row - assignedRow)
+            if dx == dy:
+                if not queensAssignedCopy[queen]:
+                    domainsCopy[queen].discard(row)
+                    altered = True
+        wasAltered[queen] = altered
+
+
+# MAC propagation
+def macPropagateSpecial(domainsCopy, assignedQueen, assignedRow, queensAssignedCopy, wasAltered):
+    global globalNumQueens
+    # the MAC queue for propagation
+    arcQueue = deque()
+    
+    # need to make a copy of the domains so that I can iterate and remove while I'm iterating
+    domainsCopyCopy = copy.deepcopy(domainsCopy)
+
+    for queen, altered in enumerate(wasAltered):
+        if not queensAssignedCopy[queen]:
+            if altered:
+                for otherQueen in range(globalNumQueens):
+                    if (not queensAssignedCopy[otherQueen]) and (not queen == otherQueen):
+                        arcQueue.append((otherQueen, queen))
+
+    # arcQueue is tuples of (neighbor, queen whose domain has been changed)
+    while arcQueue:
+        arc = arcQueue.popleft()
+        neighbor = arc[0]
+        alteredQueen = arc[1]
+        neighborDomain = domainsCopy[neighbor]
+        alteredQueenDomain = domainsCopy[alteredQueen]
+        
+        # make a copy of the neighbor domain so that we can both iterate and remove as we iterate
+        neighborDomainIterationCopy = copy.deepcopy(neighborDomain)
+        
+        for neighborRow in neighborDomainIterationCopy:
+            alteredQueenDomainHasSatisfyingValue = False
+            for alteredQueenRow in alteredQueenDomain:
+                dx = abs(alteredQueen - neighbor)
+                dy = abs(alteredQueenRow - neighborRow)
+                if (not dx == dy) and (not alteredQueenRow == neighborRow):
+                    # this condition checks to make sure that the altered queen has a domain value not equal or diagonal to the neighbor's domain value
+                    alteredQueenDomainHasSatisfyingValue = True
+            if not alteredQueenDomainHasSatisfyingValue:
+                # if there is no satisfying value
+                # remove the unsatisfied row from the neighbor's domain
+                neighborDomain.remove(neighborRow)
+                for neighborNeighbor, isAssigned in enumerate(queensAssignedCopy):
+                    # and add all of the unassigned neighbors (of the now-altered neighbor) to the queue (these are neighborNeighbors)
+                    if (not isAssigned) and (not neighborNeighbor == neighbor):
+                        arcQueue.append((neighborNeighbor, neighbor))
+
+
 # MAC propagation
 def macPropagate(domainsCopy, assignedQueen, assignedRow, queensAssignedCopy):
     # the MAC queue for propagation
@@ -177,6 +243,15 @@ def macPropagate(domainsCopy, assignedQueen, assignedRow, queensAssignedCopy):
                     for neighbor, isAssigned in enumerate(queensAssignedCopy):
                         if (not isAssigned) and (not neighbor == queen):
                             arcQueue.append((neighbor, queen))
+
+    # for queen, domain in enumerate(domainsCopyCopy):
+    #     for neighbor, domain in enumerate(domainsCopyCopy):
+    #         if (not queen == assignedQueen) and (not neighbor == queen) and (not queensAssignedCopy[queen]) and (not queensAssignedCopy[neighbor]):
+    #             arcQueue.append((neighbor, queen))
+
+    # for queen, domain in enumerate(domainsCopyCopy):
+    #     if (not queen == assignedQueen) and (not queensAssignedCopy[queen]):
+    #         arcQueue.append((assignedQueen, queen))
 
     # arcQueue is tuples of (neighbor, queen whose domain has been changed)
     while arcQueue:
@@ -213,7 +288,8 @@ def backtrackSearch(domains, queensAssigned, queenLocations):
     global globalBacktracks
     global globalSolutions
     global globalSolutionStrings
-    
+    global globalNumQueens
+
     global debug
     debug += 1
 
@@ -231,12 +307,11 @@ def backtrackSearch(domains, queensAssigned, queenLocations):
         queensAssignedCopy[assignedQueen] = True
         # set cell in queenLocations to true
         queenLocationsCopy[assignedQueen][assignedRow] = True
-        
+
         # if there is a conflict - use the copy of queenLocations to check if there is a conflict
         if isConflicting(queenLocationsCopy):
             # backtrack by continuing to the next assignment in the current recursive call
             continue
-            
 
         # setting isSolution to False if any queens are unassigned
         isSolution = True
@@ -253,7 +328,7 @@ def backtrackSearch(domains, queensAssigned, queenLocations):
             globalSolutionStrings.append((queenLocationsCopy, solutionString))
             # increment number of solutions
             globalSolutions += 1
-            
+
             # if we haven't reached 2*N solutions
             maxSolutions = 2 * globalNumQueens
             if not globalSolutions == maxSolutions:
@@ -271,25 +346,17 @@ def backtrackSearch(domains, queensAssigned, queenLocations):
         if globalAgorithm == "FOR":
             forPropagate(domainsCopy, assignedQueen, assignedRow)
         else:
-            macPropagate(domainsCopy, assignedQueen, assignedRow, queensAssignedCopy)
+            wasAltered = []
+            for i in range(globalNumQueens):
+                wasAltered.append(False)
+            forPropagateForMac(domainsCopy, assignedQueen, assignedRow, queensAssignedCopy, wasAltered)
+            macPropagateSpecial(domainsCopy, assignedQueen, assignedRow, queensAssignedCopy, wasAltered)
+            # macPropagate(domainsCopy, assignedQueen, assignedRow, queensAssignedCopy)
         if noEmptyDomains(domainsCopy, queensAssignedCopy):
             # it was a valid assignment so increment backtracks
             globalBacktracks += 1
-        
+
         backtrackSearch(domainsCopy, queensAssignedCopy, queenLocationsCopy)
-
-
-# def sortKey(solution):
-#     queenLocations = solution[0]
-#     print(queenLocations)
-#     value = 0
-#     for queen, isAssignedToRow in enumerate(queenLocations):
-#         for row, isAssigned in enumerate(isAssignedToRow):
-#             if isAssigned:
-#                 print(queen)
-#                 print(row)
-#                 value += (10 ** queen) + row
-#     return value
 
 
 def doPrint():
