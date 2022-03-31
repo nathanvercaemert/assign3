@@ -177,6 +177,22 @@ def macPropagate(domainsCopy, assignedQueen, assignedRow, queensAssignedCopy):
                         arcQueue.append((neighborNeighbor, neighbor))
 
 
+def onlyFirstAssigned(queensAssignedCopy):
+    for queen, isAssigned in enumerate(queensAssignedCopy):
+        if queen > 1 and isAssigned:
+            return False
+    return True
+
+
+# def secondJustAssigned(queensAssignedCopy):
+#     if len(queensAssignedCopy) > 1:
+#         if queensAssignedCopy[0] and queensAssignedCopy[1]:
+#             for queen, isAssigned in enumerate(queensAssignedCopy):
+#                 if isAssigned:
+#                     return False
+#     return True
+
+
 # backtrackSearch
 def backtrackSearch(domains, queensAssigned, queenLocations):
     global globalAgorithm
@@ -193,7 +209,9 @@ def backtrackSearch(domains, queensAssigned, queenLocations):
         # determine which queen to assign (and where) within domains
         # this removes that row for the chosen queen's domain (because it is the assignment we are currently trying)
         assignedQueen, assignedRow = determineAssignment(domains, queensAssigned)
-        globalBacktracks += 1
+        # assignments will always be valid for MAC because all values in all domains are conflict-free
+        # if globalAgorithm == "MAC":
+        #     globalBacktracks += 1
 
         # (assign the queen)
         queensAssignedCopy = copy.deepcopy(queensAssigned)
@@ -211,6 +229,7 @@ def backtrackSearch(domains, queensAssigned, queenLocations):
 
         # if all queens have been assigned (no conflicting assignments will have reached this point)
         if isSolution:
+            # if globalAgorithm == "FOR":
             # it was a valid assignment so increment backtracks
             globalBacktracks += 1
             # save the solution string for printing
@@ -225,8 +244,7 @@ def backtrackSearch(domains, queensAssigned, queenLocations):
                 # backtrack by continuing
                 continue
             else:
-                doPrint()
-                exit()
+                break
 
         # copy domains for propagating constraints
         domainsCopy = copy.deepcopy(domains)
@@ -235,11 +253,16 @@ def backtrackSearch(domains, queensAssigned, queenLocations):
         # this removes possible assignments from the copy of domains
         if globalAgorithm == "FOR":
             forPropagate(domainsCopy, assignedQueen, assignedRow)
-            if noEmptyDomains(domainsCopy, queensAssignedCopy):
-                # it was a valid assignment so increment backtracks
-                globalBacktracks += 1
         else:
             macPropagate(domainsCopy, assignedQueen, assignedRow, queensAssignedCopy)
+            if (not noEmptyDomains(domainsCopy, queensAssignedCopy)) and onlyFirstAssigned(queensAssignedCopy):
+                # special backtrack case for first queen assignments that don't work out in MAC (we still placed them so need to backtrack)
+                globalBacktracks += 1
+        if noEmptyDomains(domainsCopy, queensAssignedCopy):
+            # it was a valid assignment so increment backtracks
+            globalBacktracks += 1
+            # if secondJustAssigned(queensAssignedCopy):
+            #     globalBacktracks += 1
         
         backtrackSearch(domainsCopy, queensAssignedCopy, queenLocationsCopy)
 
