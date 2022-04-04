@@ -1,0 +1,145 @@
+% Created 2022-04-01 Fri 09:34
+% Intended LaTeX compiler: pdflatex
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage{wrapfig}
+\usepackage{rotating}
+\usepackage[normalem]{ulem}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{capt-of}
+\usepackage{hyperref}
+\usepackage{minted}
+\usepackage{color}
+\usepackage{listings}
+\author{DESKTOP-OEFS7VE}
+\date{\today}
+\title{}
+\hypersetup{
+ pdfauthor={DESKTOP-OEFS7VE},
+ pdftitle={},
+ pdfkeywords={},
+ pdfsubject={},
+ pdfcreator={Emacs 27.2 (Org mode 9.5.1)}, 
+ pdflang={English}}
+\begin{document}
+
+\tableofcontents
+
+\section{Question 1}
+\label{sec:org653e72f}
+\subsection{a.}
+\label{sec:org5f651a4}
+\begin{enumerate}
+\item \(tea(BlackTea) \land (\forall x \:cheese(x) \Rightarrow \lnot tea(x))\)
+\item \(blend(BlackTea, GreenTea)\)
+\item \(\forall x,y \: (\lnot tea(x) \land tea(y)) \Rightarrow \lnot blend(y,x)\)
+\item \(\exists x \: tea(x) \land unoxidize(x) \land \lnot wilted(x)\)
+\item \(\exists x \forall y \: tea(x) \land ((tea(y) \land \lnot unoxidize(y)) \Rightarrow blend(x,y))\)
+\end{enumerate}
+\subsection{b.}
+\label{sec:org3970bfb}
+\subsubsection{1.}
+\label{sec:org982a5d9}
+\begin{itemize}
+\item \(tea(BlackTea) \land (cheese(x) \Rightarrow \lnot tea(x))\)
+\item \(tea(BlackTea) \land (\lnot cheese(x) \lor \lnot tea(x))\)
+\end{itemize}
+\subsubsection{2.}
+\label{sec:org10a0c9b}
+\begin{itemize}
+\item \(blend(BlackTea, GreenTea)\)
+\end{itemize}
+\subsubsection{3.}
+\label{sec:org2a3240a}
+\begin{itemize}
+\item \((\lnot tea(x) \land tea(y)) \Rightarrow \lnot blend(y,x)\)
+\item \(\lnot(\lnot tea(x) \land tea(y)) \lor \lnot blend(y,x)\)
+\item \((tea(x) \lor \lnot tea(y)) \lor \lnot blend(y,x)\)
+\item \(tea(x) \lor \lnot tea(y) \lor \lnot blend(y,x)\)
+\end{itemize}
+\subsubsection{4.}
+\label{sec:org4c12128}
+\begin{itemize}
+\item \(tea(T1) \land unoxidize(T1) \land \lnot wilted(T1)\)
+\end{itemize}
+\subsubsection{5.}
+\label{sec:org6b89032}
+\begin{itemize}
+\item \(tea(T2) \land ((tea(y) \land \lnot unoxidize(y)) \Rightarrow blend(T2,y))\)
+\item \(tea(T2) \land (\lnot(tea(y) \land \lnot unoxidize(y)) \lor blend(T2,y))\)
+\item \(tea(T2) \land ((\lnot tea(y) \lor unoxidize(y)) \lor blend(T2,y))\)
+\item \(tea(T2) \land (\lnot tea(y) \lor unoxidize(y) \lor blend(T2,y))\)
+\end{itemize}
+\subsection{c.}
+\label{sec:org9b00939}
+\section{Question 2}
+\label{sec:org8440369}
+Note that I use PL-FOL to refer to propositionalization.
+\subsection{a.}
+\label{sec:orgff5b2dc}
+\subsubsection{Provided Sentences in FOL}
+\label{sec:org1c5b150}
+\begin{itemize}
+\item Sentence 1: \(\forall x \: o(x) \Rightarrow l(x)\)
+\item Sentence 2: \(\forall x \: o(x) \Rightarrow d(x)\)
+\item Sentence 3: \(\forall x \: (o(x) \land i(x)) \Rightarrow s(x)\)
+\item Sentence 3 simplified: \(\forall x \: i(x) \Rightarrow s(x)\)
+\item The remaining sentences will take this simplified approach. It is a safe assumption that our model does not have any assignments that would complicate these simplifications.
+\item From Sentence 5: \(\forall x \: o(x) \Rightarrow (g(x) \lor si(x))\)
+\item From Sentence 8: \(\forall x \: (g(x) \land i(x)) \Rightarrow pre(x)\)
+\item From Sentence 8: \(\forall x \: si(x) \Rightarrow \lnot pre(x)\)
+\end{itemize}
+\subsubsection{Provided sentences that can be interpreted in terms of PL-FOL}
+\label{sec:orgbc88176}
+\begin{itemize}
+\item Sentence 4: \(\lnot s(C)\)
+\item Sentence 6: \(o(C)\)
+\item Sentence 7: \(g(C) \land \lnot i(C) \land \lnot s(C) \land \lnot pre(C)\)
+\end{itemize}
+\subsubsection{FOL Sentences instantiated into PL (Carol is the only customer, so she is the only instatiation that matters)}
+\label{sec:orgc9617fa}
+\begin{itemize}
+\item Sentence 1 PL-FOL: \(o(C) \Rightarrow l(C)\)
+\item Sentence 2 PL-FOL: \(o(C) \Rightarrow d(C)\)
+\item Sentence 3 PL-FOL: \(i(C) \Rightarrow s(C)\)
+\item Sentence 5 PL-FOL: \(o(C) \Rightarrow (g(C) \lor si(C))\)
+\item From Sentence 8 PL-FOL: \((g(C) \land i(C)) \Rightarrow pre(C)\)
+\item From Sentence 8 PL-FOL: \(si(C) \Rightarrow \lnot pre(C)\)
+\end{itemize}
+\subsubsection{Example: Carol can collect loyalty points (Sentence 1. combined with Sentence 6.)}
+\label{sec:org4216395}
+\begin{itemize}
+\item Sentence 1. is a FOL statement: \(\forall x \: o(x) \Rightarrow l(x)\)
+\item Sentence 6. can be interpreted as  a PL statement: \(o(C)\) (This is true in our truth table for the consistent model.)
+\item Since Carol is the only object that's a customer in our model, the only instantiation of Sentence 1. that adds value is the following: \(o(C) \Rightarrow l(C)\)
+\item Thus, in our model's truth table, \(l(C)\) is true.
+\item This is an example of how we will use the provided sentences to prove that a our model is consistent.
+\item Note that this example is not critical because there are no other statements that involve \(l(C)\) in PL-FOL
+\end{itemize}
+\subsubsection{Truth table to show a consistent model.}
+\label{sec:orgedaf441}
+No statement contradicts another statement.
+\FloatBarrier
+\begin{center}
+\begin{tabular}{lll}
+Ref & PL-FOL & T/F\\
+\hline
+S0 & \(\lnot s(C)\) & T\\
+S1 & \(o(C)\) & T\\
+S2 & \(g(C) \land \lnot i(C) \land \lnot s(C) \land \lnot pre(C)\) & T\\
+S3 & \(o(C) \Rightarrow l(C)\) & T\\
+S1 mp S3 & \(l(C)\) & T\\
+S4 & \(o(C) \Rightarrow d(C)\) & T\\
+S1 mp S4 & $\backslash$(d(C)) & T\\
+S5 & \(i(C) \Rightarrow s(C)\) & T (S2)\\
+S6 & \(o(C) \Rightarrow (g(C) \lor si(C))\) & T (S2)\\
+S7 & \((g(C) \land i(C)) \Rightarrow pre(C)\) & T (S2)\\
+S8 & \(si(C) \Rightarrow \lnot pre(C)\) & T (S2)\\
+\end{tabular}
+\end{center}
+\FloatBarriers
+\end{document}

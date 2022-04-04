@@ -22,6 +22,8 @@ globalSolutions = 0
 globalSolutionStrings = []
 # for determining conflicts
 globalNumQueens = numQueens
+# max number of solutions
+globalMaxSolutions = 2 * globalNumQueens
 
 
 # taken from stack overflow, used to create a matrix instead of numpy
@@ -199,6 +201,7 @@ def backtrackSearch(domains, queensAssigned, queenLocations):
     global globalBacktracks
     global globalSolutions
     global globalSolutionStrings
+    global globalMaxSolutions
     
     global debug
     debug += 1
@@ -229,22 +232,21 @@ def backtrackSearch(domains, queensAssigned, queenLocations):
 
         # if all queens have been assigned (no conflicting assignments will have reached this point)
         if isSolution:
-            # if globalAgorithm == "FOR":
             # it was a valid assignment so increment backtracks
             globalBacktracks += 1
+            
             # save the solution string for printing
             solutionString = makeSolutionString(queenLocationsCopy)
             globalSolutionStrings.append((queenLocationsCopy, solutionString))
             # increment number of solutions
             globalSolutions += 1
-            
+
             # if we haven't reached 2*N solutions
-            maxSolutions = 2 * globalNumQueens
-            if not globalSolutions == maxSolutions:
-                # backtrack by continuing
+            if globalSolutions < globalMaxSolutions:
                 continue
             else:
-                break
+                doPrint()
+                exit()
 
         # copy domains for propagating constraints
         domainsCopy = copy.deepcopy(domains)
@@ -255,16 +257,15 @@ def backtrackSearch(domains, queensAssigned, queenLocations):
             forPropagate(domainsCopy, assignedQueen, assignedRow)
         else:
             macPropagate(domainsCopy, assignedQueen, assignedRow, queensAssignedCopy)
-            if (not noEmptyDomains(domainsCopy, queensAssignedCopy)) and onlyFirstAssigned(queensAssignedCopy):
-                # special backtrack case for first queen assignments that don't work out in MAC (we still placed them so need to backtrack)
-                globalBacktracks += 1
-        if noEmptyDomains(domainsCopy, queensAssignedCopy):
+        if noEmptyDomains(domainsCopy, queensAssignedCopy) and globalAgorithm == "FOR":
             # it was a valid assignment so increment backtracks
             globalBacktracks += 1
-            # if secondJustAssigned(queensAssignedCopy):
-            #     globalBacktracks += 1
+        if globalAgorithm == "MAC":
+            # it's always a valid assignment for MAC (no condition here) because propagation leaves only valid assignments
+            globalBacktracks += 1
         
         backtrackSearch(domainsCopy, queensAssignedCopy, queenLocationsCopy)
+
 
 def doPrint():
     global globalAgorithm

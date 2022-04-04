@@ -1,0 +1,81 @@
+* Question 1
+** a.
+1. \(tea(BlackTea) \land (\forall x \:cheese(x) \Rightarrow \lnot tea(x))\)
+2. \(blend(BlackTea, GreenTea)\)
+3. \(\forall x,y \: (\lnot tea(x) \land tea(y)) \Rightarrow \lnot blend(y,x)\)
+4. \(\exists x \: tea(x) \land unoxidize(x) \land \lnot wilted(x)\)
+5. \(\exists x \forall y \: tea(x) \land ((tea(y) \land \lnot unoxidize(y)) \Rightarrow blend(x,y))\)
+** b.
+*** 1.
+- \(tea(BlackTea) \land (cheese(x) \Rightarrow \lnot tea(x))\)
+- \(tea(BlackTea) \land (\lnot cheese(x) \lor \lnot tea(x))\)
+*** 2.
+- \(blend(BlackTea, GreenTea)\)
+*** 3.
+- \((\lnot tea(x) \land tea(y)) \Rightarrow \lnot blend(y,x)\)
+- \(\lnot(\lnot tea(x) \land tea(y)) \lor \lnot blend(y,x)\)
+- \((tea(x) \lor \lnot tea(y)) \lor \lnot blend(y,x)\)
+- \(tea(x) \lor \lnot tea(y) \lor \lnot blend(y,x)\)
+*** 4.
+- \(tea(T1) \land unoxidize(T1) \land \lnot wilted(T1)\)
+*** 5.
+- \(tea(T2) \land ((tea(y) \land \lnot unoxidize(y)) \Rightarrow blend(T2,y))\)
+- \(tea(T2) \land (\lnot(tea(y) \land \lnot unoxidize(y)) \lor blend(T2,y))\)
+- \(tea(T2) \land ((\lnot tea(y) \lor unoxidize(y)) \lor blend(T2,y))\)
+- \(tea(T2) \land (\lnot tea(y) \lor unoxidize(y) \lor blend(T2,y))\)
+** c.
+* Question 2
+Note that I use PL-FOL to refer to propositionalization.
+** a.
+*** Provided Sentences in FOL
+- Sentence 1: \(\forall x \: o(x) \Rightarrow l(x)\)
+- Sentence 2: \(\forall x \: o(x) \Rightarrow d(x)\)
+- Sentence 3: \(\forall x \: (o(x) \land i(x)) \Rightarrow s(x)\)
+- Sentence 3 simplified: \(\forall x \: i(x) \Rightarrow s(x)\)
+- The remaining sentences will take this simplified approach. It is a safe assumption that our model does not have any assignments that would complicate these simplifications.
+- From Sentence 5: \(\forall x \: o(x) \Rightarrow (g(x) \lor si(x))\)  
+- From Sentence 8: \(\forall x \: (g(x) \land i(x)) \Rightarrow pre(x)\)
+- From Sentence 8: \(\forall x \: si(x) \Rightarrow \lnot pre(x)\)
+*** Provided sentences that can be interpreted in terms of PL-FOL
+- Sentence 4: \(\lnot s(C)\)
+- Sentence 6: \(o(C)\)
+- Sentence 7: \(g(C) \land \lnot i(C) \land \lnot s(C) \land \lnot pre(C)\)
+*** FOL Sentences instantiated into PL (Carol is the only customer, so she is the only instatiation that matters)
+- Sentence 1 PL-FOL: \(o(C) \Rightarrow l(C)\)
+- Sentence 2 PL-FOL: \(o(C) \Rightarrow d(C)\)
+- Sentence 3 PL-FOL: \(i(C) \Rightarrow s(C)\)
+- Sentence 5 PL-FOL: \(o(C) \Rightarrow (g(C) \lor si(C))\)
+- From Sentence 8 PL-FOL: \((g(C) \land i(C)) \Rightarrow pre(C)\)
+- From Sentence 8 PL-FOL: \(si(C) \Rightarrow \lnot pre(C)\)
+*** Example: Carol can collect loyalty points (Sentence 1. combined with Sentence 6.)
+- Sentence 1. is a FOL statement: \(\forall x \: o(x) \Rightarrow l(x)\)
+- Sentence 6. can be interpreted as  a PL statement: \(o(C)\) (This is true in our truth table for the consistent model.)
+- Since Carol is the only object that's a customer in our model, the only instantiation of Sentence 1. that adds value is the following: \(o(C) \Rightarrow l(C)\)
+- Thus, in our model's truth table, \(l(C)\) is true.
+- This is an example of how we will use the provided sentences to prove that a our model is consistent.
+- Note that this example is not critical because there are no other statements that involve \(l(C)\) in PL-FOL
+*** Truth table to show a consistent model.
+No statement contradicts another statement.
+\FloatBarrier
+| Ref      | PL-FOL                                                        | T/F    |
+|----------+---------------------------------------------------------------+--------|
+| S0       | \(\lnot s(C)\)                                                | T      |
+| S1       | \(o(C)\)                                                      | T      |
+| S2       | \(g(C) \land \lnot i(C) \land \lnot s(C) \land \lnot pre(C)\) | T      |
+| S3       | \(o(C) \Rightarrow l(C)\)                                     | T      |
+| S1 mp S3 | \(l(C)\)                                                      | T      |
+| S4       | \(o(C) \Rightarrow d(C)\)                                     | T      |
+| S1 mp S4 | \(d(C)\)                                                      | T      |
+| S5       | \(i(C) \Rightarrow s(C)\)                                     | T (S2) |
+| S6       | \(o(C) \Rightarrow (g(C) \lor si(C))\)                        | T (S2) |
+| S7       | \((g(C) \land i(C)) \Rightarrow pre(C)\)                      | T (S2) |
+| S8       | \(si(C) \Rightarrow \lnot pre(C)\)                            | T (S2) |
+\FloatBarriers
+** b.
+Assuming SO has been replaced with \(s(C)\), we can prove that there is a contradiction with the following resolution:
+Consider S0* to be \(s(C)\)
+*** Resolution
+- With decomposition we can move from S2 to \(\lnot s(C)\)
+- Consider S2* to be \(\lnot s(C)\)
+- S2* resolves with S0* to the empty set, thus we have a contradiction
+
