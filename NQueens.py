@@ -50,11 +50,11 @@ def createDomains(queenCount):
     return domains
 
 
-def noEmptyDomains(domains, queensAssigned):
+def nextDomainNotEmpty(domains, queensAssigned):
     global debug
     for queen, domain in enumerate(domains):
         # if domain is empty
-        if domain == set() and (not queensAssigned[queen]) and (queensAssigned[queen - 1]):
+        if domain == set() and (not queensAssigned[queen]) and (queensAssigned[queen - 1] or queen == 0):
             return False
     return True
 
@@ -113,7 +113,7 @@ def makeSolutionString(queenLocationsCopy):
 def forPropagate(domainsCopy, assignedQueen, assignedRow):
     domainsCopyCopy = copy.deepcopy(domainsCopy)
     for queen, domain in enumerate(domainsCopyCopy):
-        if queen == assignedQueen:
+        if queen > assignedQueen:
             # remove the assigned row from the remaining domains
             domainsCopy[queen].discard(assignedRow)
 
@@ -195,6 +195,35 @@ def onlyFirstAssigned(queensAssignedCopy):
 #                     return False
 #     return True
 
+def isConflicting(queenLocationsCopy):
+    global globalNumQueens
+
+    currentAssignments = []
+    for queen in range(globalNumQueens):
+        # about to check if/where each queen has been assigned
+        # for starters, -1 means they haven't been assigned
+        currentAssignments.append(-1)
+
+    # after this loop, currentAssignments will have the row to which each queen has been assigned (or -1 if not assigned)
+    # note that "queen" is a column index
+    for queen, assignment in enumerate(queenLocationsCopy):
+        for row in range(len(assignment)):
+            if assignment[row]:
+                currentAssignments[queen] = row
+
+    for queen, row in enumerate(currentAssignments):
+        for otherQueen, otherRow in enumerate(currentAssignments):
+            if (not queen == otherQueen):
+                # we are comparing the assignments of two different queens
+                if (not row == -1) and row == otherRow:
+                    # two queens have been assigned to the same row
+                    return True
+                if areDiagonal(queen, otherQueen, row, otherRow):
+                    # two queens have diagonally conflicting assignments
+                    return True
+
+    return False
+
 
 # backtrackSearch
 def backtrackSearch(domains, queensAssigned, queenLocations):
@@ -209,7 +238,7 @@ def backtrackSearch(domains, queensAssigned, queenLocations):
 
     # print(domains)
     # while there are no empty domains
-    while noEmptyDomains(domains, queensAssigned):
+    while nextDomainNotEmpty(domains, queensAssigned):
         # globalBacktracks += 1
         # determine which queen to assign (and where) within domains
         # this removes that row for the chosen queen's domain (because it is the assignment we are currently trying)
@@ -226,6 +255,11 @@ def backtrackSearch(domains, queensAssigned, queenLocations):
         # set cell in queenLocations to true
         queenLocationsCopy[assignedQueen][assignedRow] = True
 
+        if isConflicting(queenLocationsCopy):
+            continue
+        # else:
+            # globalBacktracks += 1
+
         # setting isSolution to False if any queens are unassigned
         isSolution = True
         for queen in queensAssignedCopy:
@@ -237,6 +271,10 @@ def backtrackSearch(domains, queensAssigned, queenLocations):
             # it was a valid assignment so increment backtracks
             globalBacktracks += 1
 
+            if globalSolutions == globalMaxSolutions:
+                doPrint()
+                exit()
+
             # save the solution string for printing
             solutionString = makeSolutionString(queenLocationsCopy)
             globalSolutionStrings.append((queenLocationsCopy, solutionString))
@@ -244,11 +282,8 @@ def backtrackSearch(domains, queensAssigned, queenLocations):
             globalSolutions += 1
 
             # if we haven't reached 2*N solutions
-            if globalSolutions < globalMaxSolutions:
-                continue
-
-            doPrint()
-            exit()
+            # if globalSolutions < globalMaxSolutions:
+            continue
 
         # copy domains for propagating constraints
         domainsCopy = copy.deepcopy(domains)
@@ -259,12 +294,14 @@ def backtrackSearch(domains, queensAssigned, queenLocations):
             forPropagate(domainsCopy, assignedQueen, assignedRow)
         else:
             macPropagate(domainsCopy, assignedQueen, assignedRow, queensAssignedCopy)
-        if noEmptyDomains(domainsCopy, queensAssignedCopy) and globalAgorithm == "FOR":
+        if nextDomainNotEmpty(domainsCopy, queensAssignedCopy):
             # it was a valid assignment so increment backtracks
             globalBacktracks += 1
-        if globalAgorithm == "MAC":
-            # it's always a valid assignment for MAC (no condition here) because propagation leaves only valid assignments
-            globalBacktracks += 1
+        else:
+            break
+        # if globalAgorithm == "MAC":
+        #     # it's always a valid assignment for MAC (no condition here) because propagation leaves only valid assignments
+        #     globalBacktracks += 1
 
         backtrackSearch(domainsCopy, queensAssignedCopy, queenLocationsCopy)
 
