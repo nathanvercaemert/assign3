@@ -1,0 +1,11 @@
+* Execution
+- X is either MAC or FOR
+- Y is the number of queens
+- Z is the destination file
+#+BEGIN_SRC shell
+  python3 NQueens.py X Y Z
+#+END_SRC
+* Solution
+#+BEGIN_SRC shell
+  Z
+#+END_SRC

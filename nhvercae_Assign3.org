@@ -1,3 +1,8 @@
+#+LATEX_HEADER: \usepackage{placeins}
+#+TITLE: Assignment 3
+#+SUBTITLE: CSC 520 Spring 2022 001
+#+AUTHOR: Nathan Vercaemert
+#+DATE: 2022-04-05
 * Question 1
 ** a.
 1. \(tea(BlackTea) \land (\forall x \:cheese(x) \Rightarrow \lnot tea(x))\)
@@ -25,20 +30,21 @@
 - \(tea(T2) \land (\lnot tea(y) \lor unoxidize(y) \lor blend(T2,y))\)
 ** c.
 In order to prove by resolution, we introduce the following to our KB:
-\(blend(BlackTea,cheese(x))\)
-- note that there is implied universal quantification
+1. \(blend(BlackTea,cheese(x))\)
+note that there is implied universal quantification
 *** Also in our knowledge base
-- \(tea(BlackTea)\)
-- \(\lnot tea(cheese(x))\)
+- 2. \(tea(BlackTea)\)
+- 3. \(\lnot tea(cheese(x))\)
 *** Standardized for resolution
-- \(tea(z) \lor \lnot tea(y) \lor \lnot blend(y,z)\)
+- 4. \(tea(z) \lor \lnot tea(y) \lor \lnot blend(y,z)\)
 *** Resolution
-- \(tea(z) \lor \lnot tea(y) \lor \lnot blend(y,z)\) resolves with \(tea(BlackTea)\)
-- this leaves \(tea(z) \lor \lnot blend(BlackTea,z)\) after the substitution \({y/BlackTea}\)
-- \(tea(z) \lor \lnot blend(BlackTea,z)\) resolves with \(\lnot tea(cheese(x))\)
-- this leaves \(\lnot blend(BlackTea,cheese(x))\) after the substitution \({z/cheese(x)}\)
-- \(\lnot blend(BlackTea,cheese(x))\) resolves with \(blend(BlackTea,cheese(x))\)
-- This proves that cheese does not blend with BlackTea.
+- 3. \(tea(z) \lor \lnot tea(y) \lor \lnot blend(y,z)\) resolves with 2. \(tea(BlackTea)\)
+- this leaves 4. \(tea(z) \lor \lnot blend(BlackTea,z)\) after the substitution \({y/BlackTea}\)
+- 4. \(tea(z) \lor \lnot blend(BlackTea,z)\) resolves with 3. \(\lnot tea(cheese(x))\)
+- this leaves 5. \(\lnot blend(BlackTea,cheese(x))\) after the substitution \({z/cheese(x)}\)
+- 5. \(\lnot blend(BlackTea,cheese(x))\) resolves with 1. \(blend(BlackTea,cheese(x))\)
+- this leaves the empty set
+- this proves that cheese does not blend with BlackTea.
 **** Note
 \(cheese(x)\) is being used in place of any instatiation of x that would be true in our world. It is implied that we have at least one object \(C\) that maps to a cheese, so where I use \(cheese(x), cheese(C)\) could be substituted. This could equivalently simply be \(C\) as the problem's use of "cheese" could simply be a constant. The problem's use of "cheese" is not clear in this respect. The resolution works conceptually either way.
 * Question 2
@@ -73,6 +79,7 @@ Note that I use PL-FOL to refer to propositionalization.
 - Note that this example is not critical because there are no other statements that involve \(l(C)\) in PL-FOL
 *** Truth table to show a consistent model.
 No statement contradicts another statement.
+S0 referes to "Statement 0" not "Sentence 0"
 \FloatBarrier
 | Ref      | PL-FOL                                                        | T/F    |
 |----------+---------------------------------------------------------------+--------|
@@ -85,7 +92,7 @@ No statement contradicts another statement.
 | S1 mp S4 | \(d(C)\)                                                      | T      |
 | S5       | \(i(C) \Rightarrow s(C)\)                                     | T (S2) |
 | S6       | \(o(C) \Rightarrow (g(C) \lor si(C))\)                        | T (S2) |
-| S7       | \((g(C) \land i(C)) \Rightarrow pre(C)\)                      | T (S2) |
+| S7       | \((g(C) \land i(C)) \Rightarrow pre(C)\)                      | T (S2)  |
 | S8       | \(si(C) \Rightarrow \lnot pre(C)\)                            | T (S2) |
 \FloatBarriers
 ** b.
@@ -94,5 +101,11 @@ Consider S0* to be \(s(C)\)
 *** Resolution
 - With decomposition we can move from S2 to \(\lnot s(C)\)
 - Consider S2* to be \(\lnot s(C)\)
-- S2* resolves with S0* to the empty set, thus we have a contradiction
-
+- S2* resolves with S0* to the empty set, thus we have a contradiction and our model is not consistent
+* Question 3
+Execution instructions and solutions locations explained:
+#+BEGIN_SRC shell
+  ./README.pdf
+#+END_SRC
+* VCL
+Execution was tested on the Linux Lab machine.

@@ -1,6 +1,7 @@
 import sys
 import heapq
 import copy
+import time
 from collections import deque
 
 # read in the arguments
@@ -349,7 +350,11 @@ for i in range(numQueens):
 # to which cell has the queen in each column been assigned?
 queenLocations = createSquareMatrix(numQueens, False)
 
+timePreSearch = time.process_time()
 backtrackSearch(domains, queensAssigned, queenLocations)
+timePostSearch = time.process_time()
 
 # if we didn't reach 2*N solutions
 doPrint()
+
+print("Runtime:", str(timePostSearch - timePreSearch))
