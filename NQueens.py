@@ -50,11 +50,14 @@ def createDomains(queenCount):
     return domains
 
 
-def nextDomainNotEmpty(domains, queensAssigned):
-    global debug
+def nextDomainNotEmpty(domains, queensAssignedCopy):
+    if not queensAssignedCopy[0]:
+        # assigning the first queen but the domain is empty
+        if domains[0] == set():
+            return False
     for queen, domain in enumerate(domains):
-        # if domain is empty, the queen isn't assigned yet, and it's the next queen being assigned
-        if domain == set() and (not queensAssigned[queen]) and (queen == 0 or queensAssigned[queen - 1]):
+        # if domain is empty and it's the next queen being assigned
+        if domain == set() and (not queensAssignedCopy[queen]) and (queensAssignedCopy[queen - 1]):
             return False
     return True
 
@@ -113,11 +116,12 @@ def makeSolutionString(queenLocationsCopy):
 def forPropagate(domainsCopy, assignedQueen, assignedRow):
     domainsCopyCopy = copy.deepcopy(domainsCopy)
     for queen, domain in enumerate(domainsCopyCopy):
-        if queen > assignedQueen:
-            # remove the assigned row from the remaining domains
+        # if it's the next queen being assigned
+        if queen == assignedQueen + 1:
+            # remove the assigned row from the next domain
             domainsCopy[queen].discard(assignedRow)
 
-            # remove diagonal conflicts from remaining domains
+            # remove diagonal conflicts from next domain
             for row in domain:
                 dx = abs(queen - assignedQueen)
                 dy = abs(row - assignedRow)
@@ -138,7 +142,7 @@ def macPropagate(domainsCopy, assignedQueen, assignedRow, queensAssignedCopy):
     # if an unassigned neighbor's domain is altered, add it to the queue for checking in the below while loop
     # this first for loop is basically AC-3 with xi and xj reversed
     for queen, domain in enumerate(domainsCopyCopy):
-        if (not queensAssignedCopy[queen]) and (queen > assignedQueen):
+        if (not queensAssignedCopy[queen]) and (queen == assignedQueen + 1):
             for row in domain:
                 dx = abs(queen - assignedQueen)
                 dy = abs(row - assignedRow)
@@ -250,8 +254,8 @@ def backtrackSearch(domains, queensAssigned, queenLocations):
         # set cell in queenLocations to true
         queenLocationsCopy[assignedQueen][assignedRow] = True
 
-        # if isConflicting(queenLocationsCopy):
-        #     continue
+        if isConflicting(queenLocationsCopy):
+            continue
         # else:
             # globalBacktracks += 1
 
@@ -295,8 +299,6 @@ def backtrackSearch(domains, queensAssigned, queenLocations):
         if nextDomainNotEmpty(domainsCopy, queensAssignedCopy):
             # it was a valid assignment so increment backtracks
             globalBacktracks += 1
-        else:
-            break
         # if globalAgorithm == "MAC":
         #     # it's always a valid assignment for MAC (no condition here) because propagation leaves only valid assignments
         #     globalBacktracks += 1
