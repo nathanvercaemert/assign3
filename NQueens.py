@@ -146,29 +146,33 @@ def macPropagate(domainsCopy, assignedQueen, assignedRow, queensAssignedCopy):
     # this first for loop is basically AC-3 with xi and xj reversed
     for queen, domain in enumerate(domainsCopyCopy):
         if (not queensAssignedCopy[queen]) and (queen > assignedQueen):
+            modified = False
             for row in domain:
                 dx = abs(queen - assignedQueen)
                 dy = abs(row - assignedRow)
                 # remove rows that equal the assigned row
                 # remove rows that are diagonally conflicting with assigned row
                 if row == assignedRow or dx == dy:
+                    modified = True
                     domainsCopy[queen].remove(row)
-                    # because the variable's domain was changed, add the arcs from its unassigned neighbors to the queue
-                    for neighbor, isAssigned in enumerate(queensAssignedCopy):
-                        if (not isAssigned) and (not neighbor == queen):
-                            arcQueue.append((neighbor, queen))
+            if modified:
+                # because the variable's domain was changed, add the arcs from its unassigned neighbors to the queue
+                for neighbor, isAssigned in enumerate(queensAssignedCopy):
+                    if (not isAssigned) and (not neighbor == queen):
+                        arcQueue.append((neighbor, queen))
 
     # arcQueue is tuples of (neighbor, queen whose domain has been changed)
     while arcQueue:
+        print(arcQueue)
         arc = arcQueue.popleft()
         neighbor = arc[0]
         alteredQueen = arc[1]
         neighborDomain = domainsCopy[neighbor]
         alteredQueenDomain = domainsCopy[alteredQueen]
-        
+
         # make a copy of the neighbor domain so that we can both iterate and remove as we iterate
         neighborDomainIterationCopy = copy.deepcopy(neighborDomain)
-        
+
         for neighborRow in neighborDomainIterationCopy:
             alteredQueenDomainHasSatisfyingValue = False
             for alteredQueenRow in alteredQueenDomain:
@@ -235,13 +239,11 @@ def backtrackSearch(domains, queensAssigned, queenLocations):
     global globalMaxSwitch
 
     global debug
+    debug += 1
 
     # print(domains)
     # while there are no empty domains
     while nextDomainNotEmpty(domains, queensAssigned):
-
-        debug += 1
-        # globalBacktracks += 1
 
         # # assignments will always be valid for MAC because all values in all domains are conflict-free
         # if globalAgorithm == "MAC":
@@ -273,16 +275,12 @@ def backtrackSearch(domains, queensAssigned, queenLocations):
         # if all queens have been assigned (no conflicting assignments will have reached this point)
         if isSolution:
             # it was a valid assignment so increment backtracks
-            globalBacktracks += 1
-
-            for queen, domain in enumerate(domains):
-                print(queen)
-                print(domain)
-            print(makeSolutionString(queenLocationsCopy))
-
-            # if globalSolutions > globalMaxSolutions:
-            #     doPrint()
-            #     exit()
+            if not globalMaxSwitch:
+                globalBacktracks += 1
+                for queen, domain in enumerate(domains):
+                    print(queen)
+                    print(domain)
+                print(makeSolutionString(queenLocationsCopy))
 
             # if we haven't reached 2*N solutions
             if globalSolutions < globalMaxSolutions and not globalMaxSwitch:
@@ -308,16 +306,15 @@ def backtrackSearch(domains, queensAssigned, queenLocations):
         else:
             macPropagate(domainsCopy, assignedQueen, assignedRow, queensAssignedCopy)
 
-        # if nextDomainNotEmpty(domainsCopy, queensAssignedCopy) and globalAgorithm == "FOR":
+        # if nextDomainNotEmpty(domainsCopy, queensAssignedCopy) and not globalMaxSwitch and globalAgorithm == "FOR":
         if nextDomainNotEmpty(domainsCopy, queensAssignedCopy) and not globalMaxSwitch:
             # it was a valid assignment so increment backtracks
             globalBacktracks += 1
-            # print(debug)
-            for queen, domain in enumerate(domainsCopy):
-                print(queen)
-                print(domain)
-            print(makeSolutionString(queenLocationsCopy))
-        # if globalAgorithm == "MAC":
+            # for queen, domain in enumerate(domainsCopy):
+            #     print(queen)
+            #     print(domain)
+            # print(makeSolutionString(queenLocationsCopy))
+        # if not globalMaxSwitch and globalAgorithm == "MAC":
         #     # it's always a valid assignment for MAC (no condition here) because propagation leaves only valid assignments
         #     globalBacktracks += 1
 
@@ -333,7 +330,6 @@ def doPrint():
     print("Solutions:", globalSolutions, "\n")
     print("Backtracks:", globalBacktracks, "\n")
     i = 1
-    # globalSolutionStrings.sort(key=sortKey)
     for solutionString in globalSolutionStrings:
         print("#", str(i))
         i += 1
