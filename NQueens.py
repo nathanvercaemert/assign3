@@ -54,13 +54,13 @@ def noEmptyDomains(domains, queensAssigned):
     global debug
     for queen, domain in enumerate(domains):
         # if domain is empty
-        if domain == set() and (not queensAssigned[queen]):
+        if domain == set() and (not queensAssigned[queen]) and (queensAssigned[queen - 1]):
             return False
     return True
 
 
 def determineAssignment(domains, queensAssigned):
-    # determine which column to assign (the lowest unassigned queen)
+    # determine which column to assign (the low
     for queenIndex, isAssigned in enumerate(queensAssigned):
         if not isAssigned:
             queen = queenIndex
@@ -113,15 +113,16 @@ def makeSolutionString(queenLocationsCopy):
 def forPropagate(domainsCopy, assignedQueen, assignedRow):
     domainsCopyCopy = copy.deepcopy(domainsCopy)
     for queen, domain in enumerate(domainsCopyCopy):
-        # remove the assigned row from the remaining domains
-        domainsCopy[queen].discard(assignedRow)
+        if queen == assignedQueen:
+            # remove the assigned row from the remaining domains
+            domainsCopy[queen].discard(assignedRow)
 
-        # remove diagonal conflicts from remaining domains
-        for row in domain:
-            dx = abs(queen - assignedQueen)
-            dy = abs(row - assignedRow)
-            if dx == dy:
-                domainsCopy[queen].discard(row)
+            # remove diagonal conflicts from remaining domains
+            for row in domain:
+                dx = abs(queen - assignedQueen)
+                dy = abs(row - assignedRow)
+                if dx == dy:
+                    domainsCopy[queen].discard(row)
 
 
 # MAC propagation
@@ -137,7 +138,7 @@ def macPropagate(domainsCopy, assignedQueen, assignedRow, queensAssignedCopy):
     # if an unassigned neighbor's domain is altered, add it to the queue for checking in the below while loop
     # this first for loop is basically AC-3 with xi and xj reversed
     for queen, domain in enumerate(domainsCopyCopy):
-        if (not queensAssignedCopy[queen]) and (not queen == assignedQueen):
+        if (not queensAssignedCopy[queen]) and (queen > assignedQueen):
             for row in domain:
                 dx = abs(queen - assignedQueen)
                 dy = abs(row - assignedRow)
@@ -202,13 +203,14 @@ def backtrackSearch(domains, queensAssigned, queenLocations):
     global globalSolutions
     global globalSolutionStrings
     global globalMaxSolutions
-    
+
     global debug
     debug += 1
 
     # print(domains)
     # while there are no empty domains
     while noEmptyDomains(domains, queensAssigned):
+        # globalBacktracks += 1
         # determine which queen to assign (and where) within domains
         # this removes that row for the chosen queen's domain (because it is the assignment we are currently trying)
         assignedQueen, assignedRow = determineAssignment(domains, queensAssigned)
@@ -234,7 +236,7 @@ def backtrackSearch(domains, queensAssigned, queenLocations):
         if isSolution:
             # it was a valid assignment so increment backtracks
             globalBacktracks += 1
-            
+
             # save the solution string for printing
             solutionString = makeSolutionString(queenLocationsCopy)
             globalSolutionStrings.append((queenLocationsCopy, solutionString))
@@ -244,13 +246,13 @@ def backtrackSearch(domains, queensAssigned, queenLocations):
             # if we haven't reached 2*N solutions
             if globalSolutions < globalMaxSolutions:
                 continue
-            else:
-                doPrint()
-                exit()
+
+            doPrint()
+            exit()
 
         # copy domains for propagating constraints
         domainsCopy = copy.deepcopy(domains)
-        
+
         # propagate constraints through the copy of domains (either with FOR or MAC)
         # this removes possible assignments from the copy of domains
         if globalAgorithm == "FOR":
@@ -263,7 +265,7 @@ def backtrackSearch(domains, queensAssigned, queenLocations):
         if globalAgorithm == "MAC":
             # it's always a valid assignment for MAC (no condition here) because propagation leaves only valid assignments
             globalBacktracks += 1
-        
+
         backtrackSearch(domainsCopy, queensAssignedCopy, queenLocationsCopy)
 
 
