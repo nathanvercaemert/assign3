@@ -24,6 +24,23 @@
 - \(tea(T2) \land ((\lnot tea(y) \lor unoxidize(y)) \lor blend(T2,y))\)
 - \(tea(T2) \land (\lnot tea(y) \lor unoxidize(y) \lor blend(T2,y))\)
 ** c.
+In order to prove by resolution, we introduce the following to our KB:
+\(blend(BlackTea,cheese(x))\)
+- note that there is implied universal quantification
+*** Also in our knowledge base
+- \(tea(BlackTea)\)
+- \(\lnot tea(cheese(x))\)
+*** Standardized for resolution
+- \(tea(z) \lor \lnot tea(y) \lor \lnot blend(y,z)\)
+*** Resolution
+- \(tea(z) \lor \lnot tea(y) \lor \lnot blend(y,z)\) resolves with \(tea(BlackTea)\)
+- this leaves \(tea(z) \lor \lnot blend(BlackTea,z)\) after the substitution \({y/BlackTea}\)
+- \(tea(z) \lor \lnot blend(BlackTea,z)\) resolves with \(\lnot tea(cheese(x))\)
+- this leaves \(\lnot blend(BlackTea,cheese(x))\) after the substitution \({z/cheese(x)}\)
+- \(\lnot blend(BlackTea,cheese(x))\) resolves with \(blend(BlackTea,cheese(x))\)
+- This proves that cheese does not blend with BlackTea.
+**** Note
+\(cheese(x)\) is being used in place of any instatiation of x that would be true in our world. It is implied that we have at least one object \(C\) that maps to a cheese, so where I use \(cheese(x), cheese(C)\) could be substituted. This could equivalently simply be \(C\) as the problem's use of "cheese" could simply be a constant. The problem's use of "cheese" is not clear in this respect. The resolution works conceptually either way.
 * Question 2
 Note that I use PL-FOL to refer to propositionalization.
 ** a.
