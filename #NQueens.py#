@@ -292,7 +292,7 @@ def backtrackSearch(domains, queensAssigned, queenLocations):
                 # increment number of solutions
                 globalSolutions += 1
                 continue
-            elif globalSolutions == globalMaxSolutions and not globalMaxSwitch:
+            elif globa
                 globalMaxSwitch = True
                 continue
             else:
@@ -309,7 +309,7 @@ def backtrackSearch(domains, queensAssigned, queenLocations):
             macPropagate(domainsCopy, assignedQueen, assignedRow, queensAssignedCopy)
 
         # if nextDomainNotEmpty(domainsCopy, queensAssignedCopy) and globalAgorithm == "FOR":
-        if nextDomainNotEmpty(domainsCopy, queensAssignedCopy) and not globalMaxSwitch:
+        if nextDomainNotEmpty(domainsCopy, queensAssignedCopy):
             # it was a valid assignment so increment backtracks
             globalBacktracks += 1
             # print(debug)
