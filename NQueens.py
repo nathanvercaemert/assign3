@@ -26,6 +26,9 @@ globalNumQueens = numQueens
 # max number of solutions
 globalMaxSolutions = 2 * globalNumQueens
 globalMaxSwitch = False
+# timing
+timePreSearch = 0
+timePostSearch = 0
 
 
 # taken from stack overflow, used to create a matrix instead of numpy
@@ -238,6 +241,7 @@ def backtrackSearch(domains, queensAssigned, queenLocations):
     global globalSolutionStrings
     global globalMaxSolutions
     global globalMaxSwitch
+    global timePostSearch
 
     global debug
     debug += 1
@@ -295,7 +299,9 @@ def backtrackSearch(domains, queensAssigned, queenLocations):
                 globalMaxSwitch = True
                 continue
             else:
+                timePostSearch = time.process_time()
                 doPrint()
+                print("Runtime:", str(timePostSearch - timePreSearch))
                 exit()
 
         # copy domains for propagating constraints
