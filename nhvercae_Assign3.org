@@ -46,9 +46,10 @@ note that there is implied universal quantification
 - this leaves the empty set
 - this proves that cheese does not blend with BlackTea.
 **** Note
-\(cheese(x)\) is being used in place of any instatiation of x that would be true in our world. It is implied that we have at least one object \(C\) that maps to a cheese, so where I use \(cheese(x), cheese(C)\) could be substituted. This could equivalently simply be \(C\) as the problem's use of "cheese" could simply be a constant. The problem's use of "cheese" is not clear in this respect. The resolution works conceptually either way.
+\(cheese(x)\) is being used in place of any instatiation of x that would be true in our world. It is implied that we have at least one object \(C\) that maps to a cheese, so where I use \(cheese(x), cheese(C)\) could be substituted. This could equivalently simply be \(C\) as the problem's use of "cheese" could simply be a constant. The problem's use of "cheese" is not clear in this respect. The resolution works conceptually either way. Similarly a Skolem function could be used, cheese(C(x)). If it is required that I pick one, simply "C" is the most clear because Sentence 1 in the question refers to cheese as a constant like BlackTea.
 * Question 2
-Note that I use PL-FOL to refer to propositionalization.
+- Note that I use PL-FOL to refer to propositionalization.
+- Note that "mp" stands for Modus Ponens.
 ** a.
 *** Provided Sentences in FOL
 - Sentence 1: \(\forall x \: o(x) \Rightarrow l(x)\)
@@ -95,6 +96,8 @@ S0 referes to "Statement 0" not "Sentence 0"
 | S7       | \((g(C) \land i(C)) \Rightarrow pre(C)\)                      | T (S2)  |
 | S8       | \(si(C) \Rightarrow \lnot pre(C)\)                            | T (S2) |
 \FloatBarriers
+**** Note
+As FOL statements have either true/false values, they could have been used in place of their propositionalized counterparts. I have universally instantiated with C because the language makes more sense and it doesn't change the values for their corresponding T/F.
 ** b.
 Assuming SO has been replaced with \(s(C)\), we can prove that there is a contradiction with the following resolution:
 Consider S0* to be \(s(C)\)
