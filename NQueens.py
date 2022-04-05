@@ -69,7 +69,7 @@ def nextDomainNotEmpty(domains, queensAssignedCopy):
         if domains[0] == set():
             return False
     # figure out which queen is being assigned by iterating through the queens
-    for queen, domain in enumerate(domains)
+    for queen, domain in enumerate(domains):
         # if domain is empty and it's the next queen being assigned
         if domain == set() and (not queensAssignedCopy[queen]) and (queensAssignedCopy[queen - 1]):
             return False
@@ -191,6 +191,7 @@ def macPropagate(domainsCopy, assignedQueen, assignedRow, queensAssignedCopy):
 
     # arcQueue is tuples of (neighbor, queen whose domain has been changed)
     while arcQueue:
+        print(arcQueue)
         # get the next arc
         arc = arcQueue.popleft()
         # the neighbor of the modified queen
@@ -205,6 +206,9 @@ def macPropagate(domainsCopy, assignedQueen, assignedRow, queensAssignedCopy):
         # make a copy of the neighbor domain so that we can both iterate and remove as we iterate
         neighborDomainIterationCopy = copy.deepcopy(neighborDomain)
 
+        # keep track of whether neighbor's neighbors have been added
+        neighborNeighborsAdded = False
+        
         # for each possible value in the neighbor's domain
         for neighborRow in neighborDomainIterationCopy:
             # need to keep track of whether or not we have modified this neighbor
@@ -221,10 +225,15 @@ def macPropagate(domainsCopy, assignedQueen, assignedRow, queensAssignedCopy):
                 # if there is no satisfying value
                 # remove the unsatisfied row from the neighbor's domain
                 neighborDomain.remove(neighborRow)
+                # if the neighborsNeighbors have been added to the queue, don't add them again
+                if neighborNeighborsAdded:
+                    continue
                 for neighborNeighbor, isAssigned in enumerate(queensAssignedCopy):
                     # and add all of the unassigned neighbors (of the now-altered neighbor) to the queue (these are neighborNeighbors)
                     if (not isAssigned) and (not neighborNeighbor == neighbor):
                         arcQueue.append((neighborNeighbor, neighbor))
+                # we just added all the neighborNeighbors
+                neighborNeighborsAdded = True
 
 # has only the first queen been assigned
 def onlyFirstAssigned(queensAssignedCopy):
@@ -307,7 +316,7 @@ def backtrackSearch(domains, queensAssigned, queenLocations):
 
         if isConflicting(queenLocationsCopy):
             # there was a conflict, so we don't need to worry about this assignment any more
-
+            continue
 
         # setting isSolution to False if any queens are unassigned
         isSolution = True
