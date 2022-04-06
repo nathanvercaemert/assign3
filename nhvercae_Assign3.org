@@ -79,8 +79,10 @@ note that there is implied universal quantification
 - This is an example of how we will use the provided sentences to prove that a our model is consistent.
 - Note that this example is not critical because there are no other statements that involve \(l(C)\) in PL-FOL
 *** Truth table to show a consistent model.
-No statement contradicts another statement.
-S0 referes to "Statement 0" not "Sentence 0"
+- No statement contradicts another statement.
+- S0 referes to "Statement 0" not "Sentence 0"
+- (S2) refers to the combination of decomposition of S2 and the definition of implication to the current statement.
+- Further explanation to why S5-8 are T was deemed unnecessary as it follows from basic PL.
 \FloatBarrier
 | Ref      | PL-FOL                                                        | T/F    |
 |----------+---------------------------------------------------------------+--------|
@@ -106,7 +108,9 @@ Consider S0* to be \(s(C)\)
 - Consider S2* to be \(\lnot s(C)\)
 - S2* resolves with S0* to the empty set, thus we have a contradiction and our model is not consistent
 * Question 3
-Execution instructions and solutions locations explained:
+- FOR matches solutions
+- MAC incorporates the same tweaks necessary to match FOR solutions but uses slightly different algorithm than TAs.
+- Execution instructions and solutions locations explained:
 #+BEGIN_SRC shell
   ./README.pdf
 #+END_SRC

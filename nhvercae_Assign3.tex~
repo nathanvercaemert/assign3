@@ -1,4 +1,4 @@
-% Created 2022-04-05 Tue 14:45
+% Created 2022-04-06 Wed 08:04
 % Intended LaTeX compiler: pdflatex
 \documentclass[11pt]{article}
 \usepackage[utf8]{inputenc}
@@ -33,9 +33,9 @@
 \tableofcontents
 
 \section{Question 1}
-\label{sec:orgf9c8948}
+\label{sec:org62e8e6a}
 \subsection{a.}
-\label{sec:orgcb5b9c2}
+\label{sec:orge7a163c}
 \begin{enumerate}
 \item \(tea(BlackTea) \land (\forall x \:cheese(x) \Rightarrow \lnot tea(x))\)
 \item \(blend(BlackTea, GreenTea)\)
@@ -44,20 +44,20 @@
 \item \(\exists x \forall y \: tea(x) \land ((tea(y) \land \lnot unoxidize(y)) \Rightarrow blend(x,y))\)
 \end{enumerate}
 \subsection{b.}
-\label{sec:org52adf3d}
+\label{sec:org3e2dda6}
 \subsubsection{1.}
-\label{sec:org4779b9c}
+\label{sec:orgb5f7052}
 \begin{itemize}
 \item \(tea(BlackTea) \land (cheese(x) \Rightarrow \lnot tea(x))\)
 \item \(tea(BlackTea) \land (\lnot cheese(x) \lor \lnot tea(x))\)
 \end{itemize}
 \subsubsection{2.}
-\label{sec:org436b674}
+\label{sec:org7dbac55}
 \begin{itemize}
 \item \(blend(BlackTea, GreenTea)\)
 \end{itemize}
 \subsubsection{3.}
-\label{sec:orgd904b23}
+\label{sec:org64a1e8e}
 \begin{itemize}
 \item \((\lnot tea(x) \land tea(y)) \Rightarrow \lnot blend(y,x)\)
 \item \(\lnot(\lnot tea(x) \land tea(y)) \lor \lnot blend(y,x)\)
@@ -65,12 +65,12 @@
 \item \(tea(x) \lor \lnot tea(y) \lor \lnot blend(y,x)\)
 \end{itemize}
 \subsubsection{4.}
-\label{sec:org49b820a}
+\label{sec:org875a249}
 \begin{itemize}
 \item \(tea(T1) \land unoxidize(T1) \land \lnot wilted(T1)\)
 \end{itemize}
 \subsubsection{5.}
-\label{sec:orgf84ea5a}
+\label{sec:orga791923}
 \begin{itemize}
 \item \(tea(T2) \land ((tea(y) \land \lnot unoxidize(y)) \Rightarrow blend(T2,y))\)
 \item \(tea(T2) \land (\lnot(tea(y) \land \lnot unoxidize(y)) \lor blend(T2,y))\)
@@ -78,25 +78,25 @@
 \item \(tea(T2) \land (\lnot tea(y) \lor unoxidize(y) \lor blend(T2,y))\)
 \end{itemize}
 \subsection{c.}
-\label{sec:orgef222ce}
+\label{sec:org4c12491}
 In order to prove by resolution, we introduce the following to our KB:
 \begin{enumerate}
 \item \(blend(BlackTea,cheese(x))\)
 \end{enumerate}
 note that there is implied universal quantification
 \subsubsection{Also in our knowledge base}
-\label{sec:orgc501ec6}
+\label{sec:orgb737b21}
 \begin{itemize}
 \item 2. \(tea(BlackTea)\)
 \item 3. \(\lnot tea(cheese(x))\)
 \end{itemize}
 \subsubsection{Standardized for resolution}
-\label{sec:org390fac4}
+\label{sec:orgf9d714a}
 \begin{itemize}
 \item 4. \(tea(z) \lor \lnot tea(y) \lor \lnot blend(y,z)\)
 \end{itemize}
 \subsubsection{Resolution}
-\label{sec:orgb66f4a1}
+\label{sec:org161bc69}
 \begin{itemize}
 \item 3. \(tea(z) \lor \lnot tea(y) \lor \lnot blend(y,z)\) resolves with 2. \(tea(BlackTea)\)
 \item this leaves 4. \(tea(z) \lor \lnot blend(BlackTea,z)\) after the substitution \({y/BlackTea}\)
@@ -108,16 +108,19 @@ note that there is implied universal quantification
 \end{itemize}
 \begin{enumerate}
 \item Note
-\label{sec:orge9db5cf}
+\label{sec:org88f16cb}
 \(cheese(x)\) is being used in place of any instatiation of x that would be true in our world. It is implied that we have at least one object \(C\) that maps to a cheese, so where I use \(cheese(x), cheese(C)\) could be substituted. This could equivalently simply be \(C\) as the problem's use of "cheese" could simply be a constant. The problem's use of "cheese" is not clear in this respect. The resolution works conceptually either way. Similarly a Skolem function could be used, cheese(C(x)). If it is required that I pick one, simply "C" is the most clear because Sentence 1 in the question refers to cheese as a constant like BlackTea.
 \end{enumerate}
 \section{Question 2}
-\label{sec:orgcfd586f}
-Note that I use PL-FOL to refer to propositionalization.
+\label{sec:org5e91658}
+\begin{itemize}
+\item Note that I use PL-FOL to refer to propositionalization.
+\item Note that "mp" stands for Modus Ponens.
+\end{itemize}
 \subsection{a.}
-\label{sec:org56d140d}
+\label{sec:orgea8a11d}
 \subsubsection{Provided Sentences in FOL}
-\label{sec:org71ab05f}
+\label{sec:org84626b3}
 \begin{itemize}
 \item Sentence 1: \(\forall x \: o(x) \Rightarrow l(x)\)
 \item Sentence 2: \(\forall x \: o(x) \Rightarrow d(x)\)
@@ -129,14 +132,14 @@ Note that I use PL-FOL to refer to propositionalization.
 \item From Sentence 8: \(\forall x \: si(x) \Rightarrow \lnot pre(x)\)
 \end{itemize}
 \subsubsection{Provided sentences that can be interpreted in terms of PL-FOL}
-\label{sec:orgd732bba}
+\label{sec:org24802ba}
 \begin{itemize}
 \item Sentence 4: \(\lnot s(C)\)
 \item Sentence 6: \(o(C)\)
 \item Sentence 7: \(g(C) \land \lnot i(C) \land \lnot s(C) \land \lnot pre(C)\)
 \end{itemize}
 \subsubsection{FOL Sentences instantiated into PL (Carol is the only customer, so she is the only instatiation that matters)}
-\label{sec:org4726639}
+\label{sec:org33b1214}
 \begin{itemize}
 \item Sentence 1 PL-FOL: \(o(C) \Rightarrow l(C)\)
 \item Sentence 2 PL-FOL: \(o(C) \Rightarrow d(C)\)
@@ -146,7 +149,7 @@ Note that I use PL-FOL to refer to propositionalization.
 \item From Sentence 8 PL-FOL: \(si(C) \Rightarrow \lnot pre(C)\)
 \end{itemize}
 \subsubsection{Example: Carol can collect loyalty points (Sentence 1. combined with Sentence 6.)}
-\label{sec:org9f3a7db}
+\label{sec:orgb0bb0c9}
 \begin{itemize}
 \item Sentence 1. is a FOL statement: \(\forall x \: o(x) \Rightarrow l(x)\)
 \item Sentence 6. can be interpreted as  a PL statement: \(o(C)\) (This is true in our truth table for the consistent model.)
@@ -156,7 +159,7 @@ Note that I use PL-FOL to refer to propositionalization.
 \item Note that this example is not critical because there are no other statements that involve \(l(C)\) in PL-FOL
 \end{itemize}
 \subsubsection{Truth table to show a consistent model.}
-\label{sec:orgabee36b}
+\label{sec:org29d0a69}
 No statement contradicts another statement.
 S0 referes to "Statement 0" not "Sentence 0"
 \FloatBarrier
@@ -178,25 +181,34 @@ S8 & \(si(C) \Rightarrow \lnot pre(C)\) & T (S2)\\
 \end{tabular}
 \end{center}
 \FloatBarriers
+\begin{enumerate}
+\item Note
+\label{sec:org675b5b7}
+As FOL statements have either true/false values, they could have been used in place of their propositionalized counterparts. I have universally instantiated with C because the language makes more sense and it doesn't change the values for their corresponding T/F.
+\end{enumerate}
 \subsection{b.}
-\label{sec:orgd22be7b}
+\label{sec:org9c3fde2}
 Assuming SO has been replaced with \(s(C)\), we can prove that there is a contradiction with the following resolution:
 Consider S0* to be \(s(C)\)
 \subsubsection{Resolution}
-\label{sec:orge1b55a3}
+\label{sec:org5228eb2}
 \begin{itemize}
 \item With decomposition we can move from S2 to \(\lnot s(C)\)
 \item Consider S2* to be \(\lnot s(C)\)
 \item S2* resolves with S0* to the empty set, thus we have a contradiction and our model is not consistent
 \end{itemize}
 \section{Question 3}
-\label{sec:org9e91dd7}
-Execution instructions and solutions locations explained:
+\label{sec:orgae5e064}
+\begin{itemize}
+\item FOR matches solutions
+\item MAC incorporates the same tweaks necessary to match FOR solutions but uses slightly different algorithm than TAs.
+\item Execution instructions and solutions locations explained:
+\end{itemize}
 \lstset{language=shell,label= ,caption= ,captionpos=b,numbers=none}
 \begin{lstlisting}
 ./README.pdf
 \end{lstlisting}
 \section{VCL}
-\label{sec:orge1c103b}
+\label{sec:org402958e}
 Execution was tested on the Linux Lab machine.
 \end{document}
