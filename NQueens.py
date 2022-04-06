@@ -11,6 +11,7 @@ numQueens = sys.argv[2]
 numQueens = int(numQueens)
 # numQueens = 4
 outputFileName = sys.argv[3]
+f = open(outputFileName, "w")
 
 # globals
 # for debugging
@@ -191,7 +192,7 @@ def macPropagate(domainsCopy, assignedQueen, assignedRow, queensAssignedCopy):
 
     # arcQueue is tuples of (neighbor, queen whose domain has been changed)
     while arcQueue:
-        print(arcQueue)
+        # print(arcQueue)
         # get the next arc
         arc = arcQueue.popleft()
         # the neighbor of the modified queen
@@ -386,14 +387,14 @@ def doPrint():
     global globalBacktracks
     global globalSolutions
     global globalSolutionStrings
-    print(globalAgorithm, "\n")
-    print("Solutions:", globalSolutions, "\n")
-    print("Backtracks:", globalBacktracks, "\n")
+    f.write(globalAgorithm + "\n\n")
+    f.write("Solutions: " + str(globalSolutions) + "\n\n")
+    f.write("Backtracks: " + str(globalBacktracks) + "\n\n")
     i = 1
     for solutionString in globalSolutionStrings:
-        print("#", str(i))
+        f.write("# " + str(i) + "\n")
         i += 1
-        print(solutionString[1])
+        f.write(solutionString[1] + "\n")
 
 
 # main
